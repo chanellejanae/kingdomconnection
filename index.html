@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kingdom Connection</title>
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIktpbmdkb20gQ29ubmVjdGlvbiIsCiAgInNob3J0X25hbWUiOiAiS2luZ2RvbSIsCiAgImRlc2NyaXB0aW9uIjogIkRlZXBlbiB5b3VyIHJlbGF0aW9uc2hpcCB0aHJvdWdoIG1lYW5pbmdmdWwgY29udmVyc2F0aW9ucyBhbmQgc2hhcmVkIGZhaXRoIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmYWZhZmEiLAogICJ0aGVtZV9jb2xvciI6ICIjNjY3ZWVhIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lnZG1sbGQwSnZlRDBpTUNBd0lERXlPQ0F4TWpnaUlIaHRiRzV6UFNKb2RIUndPaTh2ZDNkM0xuY3pMbTl5Wnk4eU1EQXdMM04yWnlJK1BHUmxabk0rUEhkcFpHVjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lnYVdROUlqQWlMejQ4TDJSbFpuTStQR2RzYVc1bFlYSkhabUZrYVdWdWRDQnBaRDBpWjNKaFpHbGxiblFpUGp4emRHOXdJRzltWm5ObGREMGlNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTTJOamRsWldFaUx6NDhjM1J2Y0NCdlptWnpaWFE5SWpFd01DVWlJSE4wYjNBdFkyOXNiM0k5SWlNM05qUmlZVElpTHo0OEwyZHNhVzVsWVhKSFptRmthV1Z1ZEQ0OGNtVmpkQ0IzYVdSMGFEMGlPREFpSUdobGFXZG9kRDBpT0RBaUlIZzlJakkwSWlCNVBTSXlOQ0lnY25nOUlqSXdJaUJtYVd4c1BTSjFjbXdvSTJkeVlXUnBaVzUwS1NJdkBqeDBaWGgwSUhnOUlqWTBJaUI1UFNJMk5DSWdabWxzYkQwaWQyaHBkR1VpSUdadmJuUXRjMmw2WlQwaU5EQnFlQ0lnWm05dWRDMTNaV2xuYUhROUlqWXdNQ0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJK01qVXVNVHd2ZEdWNGRENDhMM04yWno0PSIsCiAgICAgICJzaXplcyI6ICIxMjh4MTI4IiwKIAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9LAogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU5URXlJaUJvWldsbmFIUTlJalV4TWlJZ2RtbGxkMEp2ZUQwaU1DQXdJRFV4TWlBMU1USWlJSGh0Ykc1elBTSm9kSFJ3T2k4dmQzZDNMbmN6TG05eVp5OHlNREF3TDNOMlp5SStQR1JsWm5NK1BIZHBaSFJvUFNJMU1USWlJR2hsYVdkb2REMGlOVEV5SWlCcFpEMGlNQ0lnTHo0OEwyUmxabk0rUEdkc2FXNWxZWEpIWm1Ga2FXVnVkQ0JwWkQwaVozSmhaR2xsYm5RaVBqeHpkRzl3SUc5bVpuTmxkRDBpTUNVaUlITjBiM0F0WTI5c2IzSTlJaU0yTmpkbFpXRWlMejQ4YzNSdmNDQnZabVp6WlhROUlqRXdNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTTNOalJpWVRJaUx6NDhMMmRzYVc1bFlYSkhaV0ZrYVdWdWRENDhjbVZqZENCM2FXUjBhRDBpTXpJd0lpQm9aV2xuYUhROUlqTXlNQ0lnZUQwaU9UWWlJSGs5SWprMklpQnllRDBpT0RBaUlHWnBiR3c5SW5WeWJDZ2paMkpoWkdsbGJuUXBJaTgrUEhSbGVIUWdlRDBpTWpVMklpQjVQU0l5TlRZaUlHWnBiR3c5SW5kb2FYUmxJaUJtYjI1MExYTnBlbVU5SWpFMk1IQjRJaUJtYjI1MExYZGxhV2RvZEQwaU5qQXdJaUIwWlhoMExXRnVZMmh2Y2owaWJXbGtaR3hsUGpFd01TNDJQQzkwWlhoMFBqd3ZjM1puUGc9PSIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+    
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Kingdom Connection">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2N2VlYSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzc2NGJhMiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iODBweCIgZm9udC13ZWlnaHQ9IjYwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+💕PC90ZXh0Pjwvc3ZnPg==">
+    
+    <!-- Standard favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50Ij48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNjY3ZWVhIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNzY0YmEyIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0idXJsKCNncmFkaWVudCkiLz48dGV4dCB4PSIxNiIgeT0iMjIiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE4cHgiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjI1LjE8L3RleHQ+PC9zdmc+">
+    
+    <!-- Android Chrome -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
     <style>
         body {
             box-sizing: border-box;
@@ -848,7 +864,7 @@
 
         // Initialize logo loading
         function initializeLogo() {
-            const logoUrl = 'https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png';
+            const logoUrl = 'YOUR_GITHUB_RAW_URL_HERE';
             
             const logoElements = ['appLogo', 'connectionLogo', 'mainLogo'];
             
@@ -1230,5 +1246,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f1d38ae28667bf',t:'MTc2MDU1NzYyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f1f11884147adc',t:'MTc2MDU1ODgzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
