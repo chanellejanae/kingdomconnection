@@ -698,7 +698,8 @@
             <button type="submit" class="btn" id="authSubmit">Sign In</button>
         </form>
         <div class="auth-toggle">
-            <p>Don't have an account? <button type="button" id="toggleAuth">Sign up</button></p>
+            <button type="button" class="btn btn-secondary" id="createAccountBtn">Create Account</button>
+            <button type="button" class="btn btn-secondary" id="forgotPasswordBtn">Forgot Password?</button>
         </div>
     </div>
 
@@ -836,6 +837,28 @@
             </div>
             
             <button class="draw-btn" onclick="drawNewCards()">Draw New Cards</button>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Reset Password</h2>
+                <button class="close-btn" onclick="closeForgotPassword()">&times;</button>
+            </div>
+            
+            <form id="forgotPasswordForm">
+                <div class="form-group">
+                    <label for="resetEmail" class="form-label">Email Address</label>
+                    <input type="email" id="resetEmail" class="form-input" placeholder="Enter your email" required>
+                </div>
+                <button type="submit" class="btn">Send Reset Link</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="closeForgotPassword()">Back to Sign In</button>
+            </div>
         </div>
     </div>
 
@@ -1582,17 +1605,36 @@
         function toggleAuthMode() {
             isSignUp = !isSignUp;
             const submitBtn = document.getElementById('authSubmit');
-            const toggleBtn = document.getElementById('toggleAuth');
+            const createBtn = document.getElementById('createAccountBtn');
+            const forgotBtn = document.getElementById('forgotPasswordBtn');
             
             if (isSignUp) {
-                submitBtn.textContent = 'Sign Up';
-                toggleBtn.parentElement.innerHTML = 'Already have an account? <button type="button" id="toggleAuth">Sign in</button>';
+                submitBtn.textContent = 'Create Account';
+                createBtn.textContent = 'Back to Sign In';
+                forgotBtn.style.display = 'none';
             } else {
                 submitBtn.textContent = 'Sign In';
-                toggleBtn.parentElement.innerHTML = 'Don\'t have an account? <button type="button" id="toggleAuth">Sign up</button>';
+                createBtn.textContent = 'Create Account';
+                forgotBtn.style.display = 'inline-block';
             }
-            
-            document.getElementById('toggleAuth').addEventListener('click', toggleAuthMode);
+        }
+
+        function openForgotPassword() {
+            document.getElementById('forgotPasswordModal').classList.add('show');
+        }
+
+        function closeForgotPassword() {
+            document.getElementById('forgotPasswordModal').classList.remove('show');
+        }
+
+        async function handleForgotPassword(email) {
+            try {
+                await auth.sendPasswordResetEmail(email);
+                showNotification('Password reset email sent! Check your inbox 📧');
+                closeForgotPassword();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
         }
 
         async function handleAuth(email, password) {
@@ -2162,8 +2204,9 @@
                 handleAuth(email, password);
             });
 
-            // Toggle auth mode
-            document.getElementById('toggleAuth').addEventListener('click', toggleAuthMode);
+            // Auth button listeners
+            document.getElementById('createAccountBtn').addEventListener('click', toggleAuthMode);
+            document.getElementById('forgotPasswordBtn').addEventListener('click', openForgotPassword);
 
             // Couple code form submission
             document.getElementById('coupleCodeForm').addEventListener('submit', function(e) {
@@ -2174,6 +2217,13 @@
                 }
             });
 
+            // Forgot password form submission
+            document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('resetEmail').value;
+                handleForgotPassword(email);
+            });
+
             // Profile picture upload
             document.getElementById('profilePicInput').addEventListener('change', function(e) {
                 const file = e.target.files[0];
@@ -2182,10 +2232,16 @@
                 }
             });
 
-            // Close modal when clicking outside
+            // Close modals when clicking outside
             document.getElementById('settingsModal').addEventListener('click', function(e) {
                 if (e.target === this) {
                     closeSettings();
+                }
+            });
+
+            document.getElementById('forgotPasswordModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeForgotPassword();
                 }
             });
 
@@ -2271,5 +2327,5 @@
             }
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f2aa508063fa22',t:'MTc2MDU2NjQyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f2ae7e44bffa22',t:'MTc2MDU2NjU5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
