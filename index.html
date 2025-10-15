@@ -5,1996 +5,2271 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kingdom Connection</title>
     
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        
-        // Your Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyA3jL36hYZBmQsjuI02VY8FfNRvRGuTvKk",
-            authDomain: "kingdomconnection-ac1cd.firebaseapp.com",
-            projectId: "kingdomconnection-ac1cd",
-            storageBucket: "kingdomconnection-ac1cd.firebasestorage.app",
-            messagingSenderId: ". ",
-            appId: "1:. :web:798bed278e7104fe153cae",
-            measurementId: "G-BX9X4ZXCXX"
-        };
-        
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        // Make Firebase available globally
-        window.firebaseAuth = auth;
-        window.firebaseDb = db;
-        window.firebaseModules = {
-            createUserWithEmailAndPassword,
-            signInWithEmailAndPassword,
-            onAuthStateChanged,
-            signOut,
-            doc,
-            setDoc,
-            getDoc,
-            onSnapshot,
-            updateDoc,
-            collection,
-            query,
-            where,
-            getDocs
-        };
-    </script>
-    
     <!-- Web App Manifest -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIktpbmdkb20gQ29ubmVjdGlvbiIsCiAgInNob3J0X25hbWUiOiAiS2luZ2RvbSIsCiAgImRlc2NyaXB0aW9uIjogIkRlZXBlbiB5b3VyIHJlbGF0aW9uc2hpcCB0aHJvdWdoIG1lYW5pbmdmdWwgY29udmVyc2F0aW9ucyBhbmQgc2hhcmVkIGZhaXRoIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmYWZhZmEiLAogICJ0aGVtZV9jb2xvciI6ICIjNjY3ZWVhIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lnZG1sbGQwSnZlRDBpTUNBd0lERXlPQ0F4TWpnaUlIaHRiRzV6UFNKb2RIUndPaTh2ZDNkM0xuY3pMbTl5Wnk4eU1EQXdMM04yWnlJK1BHUmxabk0rUEhkcFpHVjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lnYVdROUlqQWlMejQ4TDJSbFpuTStQR2RzYVc1bFlYSkhabUZrYVdWdWRDQnBaRDBpWjNKaFpHbGxiblFpUGp4emRHOXdJRzltWm5ObGREMGlNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTTJOamRsWldFaUx6NDhjM1J2Y0NCdlptWnpaWFE5SWpFd01DVWlJSE4wYjNBdFkyOXNiM0k5SWlNM05qUmlZVElpTHo0OEwyZHNhVzVsWVhKSFptRmthV1Z1ZEQ0OGNtVmpkQ0IzYVdSMGFEMGlPREFpSUdobGFXZG9kRDBpT0RBaUlIZzlJakkwSWlCNVBTSXlOQ0lnY25nOUlqSXdJaUJtYVd4c1BTSjFjbXdvSTJkeVlXUnBaVzUwS1NJdkBqeDBaWGgwSUhnOUlqWTBJaUI1UFNJMk5DSWdabWxzYkQwaWQyaHBkR1VpSUdadmJuUXRjMmw2WlQwaU5EQnFlQ0lnWm05dWRDMTNaV2xuYUhROUlqWXdNQ0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJK01qVXVNVHd2ZEdWNGRENDhMM04yWno0PSIsCiAgICAgICJzaXplcyI6ICIxMjh4MTI4IiwKIAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9LAogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU5URXlJaUJvWldsbmFIUTlJalV4TWlJZ2RtbGxkMEp2ZUQwaU1DQXdJRFV4TWlBMU1USWlJSGh0Ykc1elBTSm9kSFJ3T2k4dmQzZDNMbmN6TG05eVp5OHlNREF3TDNOMlp5SStQR1JsWm5NK1BIZHBaSFJvUFNJMU1USWlJR2hsYVdkb2REMGlOVEV5SWlCcFpEMGlNQ0lnTHo0OEwyUmxabk0rUEdkc2FXNWxZWEpIWm1Ga2FXVnVkQ0JwWkQwaVozSmhaR2xsYm5RaVBqeHpkRzl3SUc5bVpuTmxkRDBpTUNVaUlITjBiM0F0WTI5c2IzSTlJaU0yTmpkbFpXRWlMejQ4YzNSdmNDQnZabVp6WlhROUlqRXdNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTTNOalJpWVRJaUx6NDhMMmRzYVc1bFlYSkhaV0ZrYVdWdWRENDhjbVZqZENCM2FXUjBhRDBpTXpJd0lpQm9aV2xuYUhROUlqTXlNQ0lnZUQwaU9UWWlJSGs5SWprMklpQnllRDBpT0RBaUlHWnBiR3c5SW5WeWJDZ2paMkpoWkdsbGJuUXBJaTgrUEhSbGVIUWdlRDBpTWpVMklpQjVQU0l5TlRZaUlHWnBiR3c5SW5kb2FYUmxJaUJtYjI1MExYTnBlbVU5SWpFMk1IQjRJaUJtYjI1MExYZGxhV2RvZEQwaU5qQXdJaUIwWlhoMExXRnVZMmh2Y2owaWJXbGtaR3hsUGpFd01TNDJQQzkwWlhoMFBqd3ZjM1puUGc9PSIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIktpbmdkb20gQ29ubmVjdGlvbiIsCiAgInNob3J0X25hbWUiOiAiS2luZ2RvbSIsCiAgImRlc2NyaXB0aW9uIjogIkNvdXBsZXMgam91cm5hbCBmb3Igc3Bpcml0dWFsIGNvbm5lY3Rpb24iLAogICJzdGFydF91cmwiOiAiLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZhZmFmYSIsCiAgInRoZW1lX2NvbG9yIjogIiM2NjdlZWEiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vY2hhbmVsbGVqYW5hZS9raW5nZG9tY29ubmVjdGlvbi9tYWluL2xvZ28ucG5nIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9wbmciCiAgICB9LAogICAgewogICAgICAic3JjIjogImh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9jaGFuZWxsZWphbmFlL2tpbmdkb21jb25uZWN0aW9uL21haW4vbG9nby5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
     
-    <!-- iOS Safari -->
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png">
+    
+    <!-- Apple Web App -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Kingdom Connection">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png">
-    
-    <!-- Standard favicon -->
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png">
-    
-    <!-- Android Chrome -->
-    <meta name="theme-color" content="#667eea">
-    <meta name="mobile-web-app-capable" content="yes">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <style>
         body {
             box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #fafafa;
-            min-height: 100%;
-            color: #1a1a1a;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-
-        html {
-            height: 100%;
+            color: #2c2c2c;
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            min-height: 100%;
         }
 
         .header {
-            text-align: center;
-            margin-bottom: 40px;
-            background: #ffffff;
-            padding: 40px 30px;
+            background: white;
             border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid #f0f0f0;
-            position: relative;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .logo-container {
+        .header-left {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
+            gap: 16px;
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c2c2c;
+            margin: 0;
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stats-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #6c757d;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
             color: white;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-            overflow: hidden;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
 
-        .logo img {
+        .profile-pic:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-pic img {
             width: 100%;
             height: 100%;
+            border-radius: 50%;
             object-fit: cover;
-            border-radius: 20px;
         }
 
-        .header h1 {
-            color: #1a1a1a;
-            margin: 0 0 12px 0;
-            font-size: 2.25rem;
-            font-weight: 600;
-            letter-spacing: -0.025em;
-        }
-
-        .header p {
-            color: #6b7280;
-            font-size: 1rem;
-            margin: 0;
-            font-weight: 400;
-        }
-
-        .mode-selector {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .mode-btn {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            padding: 20px 24px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.95rem;
+        .display-name {
             font-weight: 500;
-            color: #374151;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
-            min-width: 200px;
+            color: #2c2c2c;
         }
 
-        .mode-btn:hover {
-            border-color: #d1d5db;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        }
-
-        .mode-btn.active {
-            background: #1a1a1a;
-            color: #ffffff;
-            border-color: #1a1a1a;
-        }
-
-        .btn {
-            background: #1a1a1a;
-            color: #ffffff;
+        .settings-btn {
+            background: none;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            color: #666;
             cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
         }
 
-        .btn:hover {
-            background: #374151;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        .settings-btn:hover {
+            background: #f5f5f5;
         }
 
-        .btn-secondary {
-            background: #ffffff;
-            color: #374151;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
         }
 
-        .btn-secondary:hover {
-            background: #f9fafb;
-            border-color: #d1d5db;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .login-container {
-            max-width: 400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #f0f0f0;
-            text-align: center;
         }
 
-        .login-form {
+        .card-header {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .partner-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .partner-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .partner-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .partner-name {
+            font-weight: 500;
+            color: #2c2c2c;
+            font-size: 16px;
+        }
+
+        .question-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-category {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #2c2c2c;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .journal-area {
+            margin-bottom: 20px;
+        }
+
+        .journal-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #495057;
+            font-size: 14px;
+        }
+
+        .journal-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background: #fafafa;
+        }
+
+        .journal-textarea:focus {
+            outline: none;
+            border-color: #6c757d;
+            box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.1);
+            background: white;
+        }
+
+        .save-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            width: 100%;
+        }
+
+        .save-btn:hover {
+            background: #5a6268;
+        }
+
+        .save-btn:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c2c2c;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .close-btn:hover {
+            background: #f8f9fa;
         }
 
         .form-group {
-            text-align: left;
+            margin-bottom: 20px;
         }
 
-        .form-group label {
+        .form-label {
             display: block;
-            margin-bottom: 8px;
-            color: #374151;
             font-weight: 500;
-            font-size: 0.875rem;
+            margin-bottom: 8px;
+            color: #495057;
+            font-size: 14px;
         }
 
-        .form-group input {
+        .form-input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #e5e7eb;
+            padding: 12px;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
-            font-size: 0.875rem;
-            color: #1a1a1a;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
+            font-size: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .form-group input:focus {
+        .form-input:focus {
             outline: none;
-            border-color: #9ca3af;
-            box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.1);
+            border-color: #6c757d;
+            box-shadow: 0 0 0 3px rgba(108, 117, 125, 0.1);
+        }
+
+        .btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .btn:hover {
+            background: #5a6268;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
         }
 
         .profile-pic-upload {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
-        .profile-pic-preview {
+        .profile-pic-large {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2em;
-            color: #9ca3af;
-            overflow: hidden;
+            color: white;
+            font-weight: 600;
+            font-size: 24px;
         }
 
-        .profile-pic-preview img {
+        .profile-pic-large img {
             width: 100%;
             height: 100%;
+            border-radius: 50%;
             object-fit: cover;
         }
 
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
+        .file-input {
+            display: none;
         }
 
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-input-label {
-            background: #f9fafb;
-            color: #374151;
+        .file-label {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
             padding: 8px 16px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border: 1px solid #e5e7eb;
-            transition: all 0.2s ease;
+            font-size: 14px;
+            color: #495057;
+            transition: background-color 0.2s ease;
         }
 
-        .file-input-label:hover {
-            background: #f3f4f6;
-            border-color: #d1d5db;
+        .file-label:hover {
+            background: #e9ecef;
         }
 
-        .user-profile {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #ffffff;
-            padding: 12px 16px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid #f0f0f0;
-            z-index: 1000;
+        .auth-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 32px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
         }
 
-        .profile-settings {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid #f0f0f0;
-        }
-
-        .profile-settings h3 {
-            color: #1a1a1a;
-            margin: 0 0 20px 0;
-            font-size: 1.25rem;
+        .auth-title {
+            text-align: center;
+            font-size: 24px;
             font-weight: 600;
+            color: #2c2c2c;
+            margin-bottom: 32px;
         }
 
-        .profile-pic-section {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
         }
 
-        .current-profile-pic {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2em;
-            color: #9ca3af;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .current-profile-pic img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .pic-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1em;
-            color: #9ca3af;
-            overflow: hidden;
-        }
-
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .user-name {
-            color: #374151;
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-
-        .logout-btn {
+        .auth-toggle button {
             background: none;
             border: none;
-            color: #9ca3af;
+            color: #6c757d;
             cursor: pointer;
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            margin-left: 4px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
+            text-decoration: underline;
+            font-size: 14px;
         }
 
-        .logout-btn:hover {
-            color: #374151;
-            background: #f9fafb;
-        }
-
-        .connection-status {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
+        .loading {
+            display: none;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .date-night-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #f0f0f0;
-        }
-
-        .connection-code {
-            background: #1a1a1a;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            margin: 15px 0;
-            display: inline-block;
-            font-family: 'Inter', monospace;
-        }
-
-        .journal-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .journal-header {
             text-align: center;
-            margin-bottom: 40px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .journal-header h2 {
-            color: #4a5568;
-            margin: 0 0 10px 0;
-            font-size: 2em;
-            font-weight: 400;
-        }
-
-        .journal-header p {
-            color: #718096;
-            margin: 0;
-            font-size: 1.1em;
-        }
-
-        .journal-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 24px;
             margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px solid #f3f4f6;
         }
 
-        .journal-card h3 {
-            color: #1a1a1a;
-            margin: 0 0 16px 0;
-            font-size: 1.25rem;
+        .date-night-title {
+            font-size: 18px;
             font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c2c2c;
         }
 
-        .question-category-badge {
-            display: inline-block;
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            margin-bottom: 15px;
-            border: 2px solid rgba(102, 126, 234, 0.2);
+        .date-night-subtitle {
+            color: #6c757d;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
 
-        .daily-question {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            font-style: italic;
+        .card-stack {
+            position: relative;
+            width: 300px;
+            height: 180px;
+            margin: 0 auto 20px;
+            perspective: 1000px;
         }
 
-        .reflection-areas {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .partner-reflection {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            border: 1px solid #f3f4f6;
-        }
-
-        .partner-reflection h4 {
-            color: #374151;
-            margin: 0 0 15px 0;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .partner-reflection textarea {
-            width: 100%;
-            min-height: 120px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            font-size: 0.875rem;
-            color: #1a1a1a;
-            resize: vertical;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-            line-height: 1.5;
-        }
-
-        .partner-reflection textarea:focus {
-            outline: none;
-            border-color: #9ca3af;
-            box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.1);
-        }
-
-        .partner-profile {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .partner-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
-            color: #9ca3af;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .partner-avatar img {
+        .date-card {
+            position: absolute;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-        }
-
-        .partner-info h4 {
-            margin: 0;
-            color: #374151;
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .journal-controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-
-        .date-night-card {
-            background: #ffffff;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid #e9ecef;
             border-radius: 16px;
-            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
-            border: 1px solid #f0f0f0;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.1),
+                0 1px 3px rgba(0,0,0,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.9);
+            transform-style: preserve-3d;
         }
 
-        .card-number {
+        .date-card::before {
+            content: '';
             position: absolute;
-            top: 20px;
-            right: 24px;
-            background: #1a1a1a;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 500;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 100%);
+            border-radius: 14px;
+            pointer-events: none;
+        }
+
+        .date-card:nth-child(1) { 
+            transform: rotate(-2deg) translateY(0px) translateZ(0px);
+            z-index: 1;
+        }
+        .date-card:nth-child(2) { 
+            transform: rotate(1deg) translateY(-4px) translateZ(10px);
+            z-index: 2;
+        }
+        .date-card:nth-child(3) { 
+            transform: rotate(-0.5deg) translateY(-8px) translateZ(20px);
+            z-index: 3;
+        }
+
+        .date-card:hover {
+            transform: rotate(0deg) translateY(-15px) translateZ(50px) scale(1.05);
+            z-index: 10;
+            box-shadow: 
+                0 15px 35px rgba(0,0,0,0.15),
+                0 5px 15px rgba(0,0,0,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.9);
         }
 
         .card-question {
-            font-size: 1.25rem;
-            color: #1a1a1a;
-            line-height: 1.6;
-            margin: 20px 0 40px 0;
+            font-size: 15px;
             font-weight: 500;
+            color: #2c2c2c;
+            line-height: 1.4;
             position: relative;
             z-index: 1;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
         }
 
-        .card-controls {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
-        }
-
-        .progress-indicator {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #6b7280;
-            font-size: 1.1em;
-        }
-
-        .sync-indicator {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #10b981;
+        .draw-btn {
+            background: #6c757d;
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.875rem;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 500;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
-        .sync-indicator.syncing {
-            background: #f59e0b;
+        .draw-btn:hover {
+            background: #5a6268;
         }
 
-        .sync-indicator.error {
-            background: #ef4444;
-        }
+
 
         @media (max-width: 768px) {
-            .container {
-                padding: 15px;
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
             
             .header {
-                padding: 20px;
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
             }
             
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .mode-btn {
-                min-width: 150px;
-                padding: 15px 20px;
-            }
-            
-            .date-night-card {
-                padding: 25px;
-            }
-            
-            .card-question {
-                font-size: 1.1em;
-            }
-
-            .reflection-areas {
-                grid-template-columns: 1fr;
-            }
-
-            .journal-header h2 {
-                font-size: 1.6em;
-            }
-
-            .journal-card {
-                padding: 20px;
-            }
-
-            .user-profile {
-                position: relative;
-                top: auto;
-                right: auto;
-                margin-bottom: 20px;
+            .header-right {
+                width: 100%;
                 justify-content: center;
+                flex-direction: column;
+                gap: 12px;
             }
+            
+            .stats-section {
+                gap: 12px;
+            }
+            
+            .stat-item {
+                padding: 6px 10px;
+            }
+            
+            .stat-number {
+                font-size: 16px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .card-stack {
+                width: 260px;
+                height: 150px;
+            }
+            
+            .modal-content {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+        }
 
-            .login-container {
-                padding: 30px 20px;
-            }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Sync Indicator -->
-        <div id="syncIndicator" class="sync-indicator hidden">
-            <span id="syncIcon">🔄</span>
-            <span id="syncText">Synced</span>
+    <!-- Authentication Screen -->
+    <div id="authScreen" class="auth-container">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection" style="width: 60px; height: 60px; border-radius: 12px; margin-bottom: 16px;">
         </div>
-
-        <!-- User Profile (shown when logged in) -->
-        <div id="userProfile" class="user-profile hidden">
-            <div class="user-avatar" id="userAvatar">👤</div>
-            <span class="user-name" id="userName"></span>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-
-        <!-- Login/Signup View -->
-        <div id="loginView" class="login-container">
-            <div class="logo-container">
-                <div class="logo" id="appLogo">
-                    <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='💕';">
-                </div>
+        <h1 class="auth-title">Kingdom Connection</h1>
+        <form id="authForm">
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" required>
             </div>
-            <h2 style="color: #4a5568; margin-bottom: 30px;">Welcome to Kingdom Connection</h2>
-            
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="login-form">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
-                    </div>
-                    <button type="submit" class="btn">Sign In</button>
-                    <button type="button" class="btn btn-secondary" onclick="showSignup()">Create Account</button>
-                </div>
-            </form>
-
-            <form id="signupForm" class="hidden" onsubmit="handleSignup(event)">
-                <div class="login-form">
-                    <div class="form-group">
-                        <label for="signupName">Your Name</label>
-                        <input type="text" id="signupName" placeholder="Enter your name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupEmail">Email</label>
-                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" placeholder="Create a password" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <label>Profile Picture (Optional)</label>
-                        <div class="profile-pic-upload">
-                            <div class="profile-pic-preview" id="profilePicPreview">📷</div>
-                            <div class="file-input-wrapper">
-                                <input type="file" id="profilePicInput" accept="image/*" onchange="handleProfilePicUpload(event)">
-                                <label for="profilePicInput" class="file-input-label">Choose Photo</label>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn">Create Account</button>
-                    <button type="button" class="btn btn-secondary" onclick="showLogin()">Back to Sign In</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Connection Setup View -->
-        <div id="connectionView" class="hidden">
-            <div class="header">
-                <div class="logo-container">
-                    <div class="logo" id="connectionLogo">
-                        <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='💕';">
-                    </div>
-                </div>
-                <h1>💕 Kingdom Connection</h1>
-                <p>Connect with your partner to start your journey together</p>
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" class="form-input" required>
             </div>
-
-            <div class="connection-status">
-                <h3 style="color: #4a5568; margin-bottom: 15px;">Connection Status</h3>
-                <div id="connectionContent">
-                    <p>Share this code with your partner:</p>
-                    <div class="connection-code" id="connectionCode"></div>
-                    <p style="color: #718096; font-size: 0.9em;">Or enter your partner's code below:</p>
-                    <div style="display: flex; gap: 12px; justify-content: center; margin-top: 15px;">
-                        <input type="text" id="partnerCode" placeholder="Enter partner's code" style="padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; text-align: center; font-size: 0.875rem; letter-spacing: 1px; font-family: 'Inter', monospace; transition: all 0.2s ease;">
-                        <button class="btn" onclick="connectWithPartner()">Connect</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main App (shown when connected) -->
-        <div id="mainApp" class="hidden">
-            <div class="header">
-                <div class="logo-container">
-                    <div class="logo" id="mainLogo">
-                        <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='💕';">
-                    </div>
-                </div>
-                <h1>💕 Kingdom Connection</h1>
-                <p>Deepen your relationship through meaningful conversations and shared faith</p>
-            </div>
-
-            <div id="modeSelector" class="mode-selector">
-                <button class="mode-btn active" onclick="showJournal()">
-                    📖 Daily Journal<br>
-                    <small>One meaningful question each day</small>
-                </button>
-                <button class="mode-btn" onclick="showDateNight()">
-                    💝 Date Night Cards<br>
-                    <small>250 conversation starters</small>
-                </button>
-                <button class="mode-btn" onclick="showHistory()">
-                    📚 Reflection History<br>
-                    <small>View and export past entries</small>
-                </button>
-                <button class="mode-btn" onclick="showSettings()">
-                    ⚙️ Settings<br>
-                    <small>Profile picture & preferences</small>
-                </button>
-            </div>
-
-            <div id="journalView" class="hidden">
-                <div class="journal-container">
-                    <div class="journal-header">
-                        <h2>💕 Daily Reflection Journal</h2>
-                        <p>Take time to reflect individually, then share your hearts together</p>
-                    </div>
-                    
-                    <div class="journal-card">
-                        <h3>🌅 Today's Question</h3>
-                        <p style="color: #718096; margin: 0 0 15px 0; font-size: 0.9rem;" id="todaysDate"></p>
-                        <div class="question-category-badge" id="questionCategoryBadge"></div>
-                        <div class="daily-question" id="dailyQuestion"></div>
-                        <button class="btn btn-secondary" onclick="getNewDailyQuestion()">🎲 New Question</button>
-                    </div>
-                    
-                    <div class="reflection-areas">
-                        <div class="partner-reflection">
-                            <div class="partner-profile" id="currentUserProfile">
-                                <div class="partner-avatar" id="currentUserAvatar">👤</div>
-                                <div class="partner-info">
-                                    <h4 id="currentUserName">Your Reflection</h4>
-                                </div>
-                            </div>
-                            <textarea id="currentUserReflection" placeholder="Take time to reflect on today's question..." oninput="autoSaveReflection()"></textarea>
-                        </div>
-                        <div class="partner-reflection">
-                            <div class="partner-profile" id="partnerProfile">
-                                <div class="partner-avatar" id="partnerAvatar">💕</div>
-                                <div class="partner-info">
-                                    <h4 id="partnerName">Partner's Reflection</h4>
-                                </div>
-                            </div>
-                            <textarea id="partnerReflection" placeholder="Your partner's reflection will appear here..." readonly></textarea>
-                        </div>
-                    </div>
-
-                    <div class="journal-controls">
-                        <button class="btn" onclick="saveJournalEntry()">💾 Save Entry</button>
-                        <button class="btn btn-secondary" onclick="clearJournal()">🗑️ Clear All</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="dateNightView" class="hidden">
-                <div class="progress-indicator" id="dateNightProgress"></div>
-                <div class="date-night-card">
-                    <div class="card-number" id="cardNumber"></div>
-                    <div class="card-question" id="dateNightQuestion"></div>
-                    <div class="card-controls">
-                        <button class="btn btn-secondary" onclick="shuffleDateNight()">🔀 Shuffle</button>
-                        <button class="btn" onclick="nextDateNightCard()">Next Card →</button>
-                        <button class="btn btn-secondary" onclick="resetDateNight()">↻ Reset Deck</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="historyView" class="hidden">
-                <div class="journal-container">
-                    <div class="journal-header">
-                        <h2>📚 Reflection History</h2>
-                        <p>Browse through your journey of growth and connection</p>
-                    </div>
-                    
-                    <div id="historyEntries" class="history-entries">
-                        <p style="text-align: center; color: #9ca3af; font-style: italic;">No journal entries yet. Start writing to see your history here!</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="settingsView" class="hidden">
-                <div class="journal-container">
-                    <div class="journal-header">
-                        <h2>⚙️ Settings</h2>
-                        <p>Manage your profile and app preferences</p>
-                    </div>
-                    
-                    <div class="profile-settings">
-                        <h3>👤 Display Name</h3>
-                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                            <input type="text" id="displayNameInput" placeholder="Enter your name" style="flex: 1; padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; color: #1a1a1a; transition: all 0.2s ease;">
-                            <button class="btn" onclick="updateDisplayName()">💾 Save Name</button>
-                        </div>
-                        <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">This name appears throughout the app and is visible to your partner.</p>
-                    </div>
-
-                    <div class="profile-settings">
-                        <h3>📷 Profile Picture</h3>
-                        <div class="profile-pic-section">
-                            <div class="current-profile-pic" id="currentProfilePic">👤</div>
-                            <div class="pic-controls">
-                                <div class="file-input-wrapper">
-                                    <input type="file" id="newProfilePicInput" accept="image/*" onchange="handleNewProfilePicUpload(event)">
-                                    <label for="newProfilePicInput" class="file-input-label">📷 Change Photo</label>
-                                </div>
-                                <button class="btn btn-secondary" onclick="removeProfilePic()" id="removePhotoBtn" style="display: none;">🗑️ Remove Photo</button>
-                            </div>
-                        </div>
-                        <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">Your profile picture is visible to your partner in journal reflections and throughout the app.</p>
-                    </div>
-
-                    <div class="profile-settings">
-                        <h3>🔗 Connection Info</h3>
-                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                            <div>
-                                <p style="margin: 0 0 5px 0; color: #374151; font-weight: 500;">Your Connection Code:</p>
-                                <div class="connection-code" style="margin: 0; font-size: 1rem; padding: 12px 16px;" id="settingsConnectionCode"></div>
-                            </div>
-                        </div>
-                        <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">Share this code with your partner to connect your accounts.</p>
-                    </div>
-                </div>
-            </div>
+            <button type="submit" class="btn" id="authSubmit">Sign In</button>
+        </form>
+        <div class="auth-toggle">
+            <p>Don't have an account? <button type="button" id="toggleAuth">Sign up</button></p>
         </div>
     </div>
 
+    <!-- Couple Code Screen -->
+    <div id="coupleCodeScreen" class="auth-container" style="display: none;">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection" style="width: 60px; height: 60px; border-radius: 12px; margin-bottom: 16px;">
+        </div>
+        <h1 class="auth-title">Connect with Your Partner</h1>
+        <p style="text-align: center; color: #6c757d; margin-bottom: 24px;">
+            Share your couple code with your partner or enter theirs to connect your journals
+        </p>
+        
+        <div class="form-group">
+            <label class="form-label">Your Couple Code</label>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <input type="text" id="yourCoupleCode" class="form-input" readonly style="background: #f8f9fa;">
+                <button type="button" class="btn" onclick="copyCode()" style="width: auto; padding: 10px 16px; margin: 0;">Copy</button>
+            </div>
+            <small style="color: #6c757d; font-size: 12px;">Share this code with your partner</small>
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0; color: #dee2e6; font-weight: bold;">OR</div>
+        
+        <form id="coupleCodeForm">
+            <div class="form-group">
+                <label for="partnerCode" class="form-label">Enter Partner's Code</label>
+                <input type="text" id="partnerCode" class="form-input" placeholder="Enter your partner's couple code" style="text-transform: uppercase;">
+            </div>
+            <button type="submit" class="btn">Connect with Partner</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" onclick="skipCoupleCode()">Skip for Now</button>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading">
+        <p>Loading your journal...</p>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="container" style="display: none;">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="logo">
+                    <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection" class="logo-img">
+                    Kingdom Connection
+                </h1>
+            </div>
+            <div class="header-right">
+                <div class="stats-section">
+                    <div class="stat-item">
+                        <span class="stat-number" id="daysTogether">0</span>
+                        <span class="stat-label">Days Together</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="currentStreak">0</span>
+                        <span class="stat-label">Day Streak</span>
+                    </div>
+                </div>
+                <div class="profile-section">
+                    <div class="profile-pic" id="profilePic">
+                        <span id="profileInitials">U</span>
+                    </div>
+                    <span class="display-name" id="displayName">User</span>
+                    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="partner-info">
+                        <div class="partner-avatar" id="partnerAvatar1">
+                            <span id="partnerInitials1">P1</span>
+                        </div>
+                        <span class="partner-name" id="partnerName1">Partner 1</span>
+                    </div>
+                </div>
+                
+                <div class="question-display">
+                    <div class="question-category" id="category1">✨ Spiritual Connection</div>
+                    <p class="question-text" id="question1">Loading today's question...</p>
+                </div>
+
+                <div class="journal-area">
+                    <label for="journal1" class="journal-label">Your thoughts and reflections:</label>
+                    <textarea id="journal1" class="journal-textarea" placeholder="Share your heart..."></textarea>
+                </div>
+
+                <button class="save-btn" onclick="saveEntry(1)" id="saveBtn1">Save Entry</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="partner-info">
+                        <div class="partner-avatar" id="partnerAvatar2">
+                            <span id="partnerInitials2">P2</span>
+                        </div>
+                        <span class="partner-name" id="partnerName2">Partner 2</span>
+                    </div>
+                </div>
+                
+                <div class="question-display">
+                    <div class="question-category" id="category2">✨ Spiritual Connection</div>
+                    <p class="question-text" id="question2">Loading today's question...</p>
+                </div>
+
+                <div class="journal-area">
+                    <label for="journal2" class="journal-label">Your thoughts and reflections:</label>
+                    <textarea id="journal2" class="journal-textarea" placeholder="Share your heart..."></textarea>
+                </div>
+
+                <button class="save-btn" onclick="saveEntry(2)" id="saveBtn2">Save Entry</button>
+            </div>
+        </div>
+
+        <div class="date-night-section">
+            <h2 class="date-night-title">💝 Date Night Cards</h2>
+            <p class="date-night-subtitle">Draw a card for deeper conversation during your special time together</p>
+            
+            <div class="card-stack">
+                <div class="date-card">
+                    <p class="card-question" id="dateCard1">What's your favorite memory of us?</p>
+                </div>
+                <div class="date-card">
+                    <p class="card-question" id="dateCard2">How do you feel most loved by me?</p>
+                </div>
+                <div class="date-card">
+                    <p class="card-question" id="dateCard3">What dream do we share for our future?</p>
+                </div>
+            </div>
+            
+            <button class="draw-btn" onclick="drawNewCards()">Draw New Cards</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Settings</h2>
+                <button class="close-btn" onclick="closeSettings()">&times;</button>
+            </div>
+            
+            <div class="profile-pic-upload">
+                <div class="profile-pic-large" id="settingsProfilePic">
+                    <span id="settingsProfileInitials">U</span>
+                </div>
+                <label for="profilePicInput" class="file-label">Change Photo</label>
+                <input type="file" id="profilePicInput" class="file-input" accept="image/*">
+            </div>
+            
+            <div class="form-group">
+                <label for="displayNameInput" class="form-label">Display Name</label>
+                <input type="text" id="displayNameInput" class="form-input" placeholder="Enter your name">
+            </div>
+            
+            <div class="form-group">
+                <label for="anniversaryInput" class="form-label">Anniversary Date</label>
+                <input type="date" id="anniversaryInput" class="form-input">
+            </div>
+            
+            <div id="partnerConnectionSection" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Your Couple Code</label>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <input type="text" id="settingsCoupleCode" class="form-input" readonly style="background: #f8f9fa;">
+                        <button type="button" class="btn" onclick="copySettingsCode()" style="width: auto; padding: 8px 12px; margin: 0; font-size: 12px;">Copy</button>
+                    </div>
+                    <small style="color: #6c757d; font-size: 12px;">Share this code with your partner</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="settingsPartnerCode" class="form-label">Connect with Partner</label>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <input type="text" id="settingsPartnerCode" class="form-input" placeholder="Enter partner's code" style="text-transform: uppercase;">
+                        <button type="button" class="btn" onclick="connectFromSettings()" style="width: auto; padding: 8px 12px; margin: 0; font-size: 12px;">Connect</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="saveSettings()">Save Changes</button>
+            <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        Entry saved! 💕
+    </div>
+
     <script>
-        const categories = {
-            "🌿 Spiritual Growth + Faith": [
-                "How has God been speaking to your heart this week?",
-                "What's a recent way you've seen God answer prayer in your life?",
-                "How can we encourage each other to spend more time with God daily?",
-                "What is a scripture you want to memorize together this month?",
-                "When do you feel closest to God — in joy, in struggle, or both?"
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3jL36hYZBmQsjuI02VY8FfNRvRGuTvKk",
+            authDomain: "kingdomconnection-ac1cd.firebaseapp.com",
+            projectId: "kingdomconnection-ac1cd",
+            storageBucket: "kingdomconnection-ac1cd.firebasestorage.app",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:798bed278e7104fe153cae",
+            measurementId: "G-BX9X4ZXCXX"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // Global variables
+        let currentUser = null;
+        let isSignUp = false;
+        let currentCoupleId = null;
+
+        // All 370 questions organized by categories
+        const questionCategories = {
+            "✨ Spiritual Connection": [
+                "How did you feel God's presence today?",
+                "What's one thing you're praying about for us right now?",
+                "How can we grow closer to God together this week?",
+                "What Bible verse has been speaking to your heart lately?",
+                "How do you see God working in our relationship?",
+                "What's one way we can serve God together?",
+                "How can we make prayer a bigger part of our daily routine?",
+                "What spiritual goal do you have for us as a couple?",
+                "How has your faith grown since we've been together?",
+                "What's one thing you're grateful to God for today?"
             ],
             "💬 Emotional Intimacy": [
-                "What's one thing I do that makes you feel truly seen and understood?",
-                "How can I better support you when you're going through a difficult time?",
-                "What's something you've been thinking about that you haven't shared with me yet?",
-                "How do you prefer to be comforted when you're feeling sad or overwhelmed?",
-                "What's one fear or worry you have that I could help you process?"
+                "What's something you've been thinking about but haven't shared yet?",
+                "How are you feeling about us right now?",
+                "What makes you feel most connected to me?",
+                "What's one fear you have about our relationship?",
+                "How can I better support you emotionally?",
+                "What's something that made you smile today?",
+                "How do you feel when we're apart?",
+                "What's one thing you need from me right now?",
+                "How do you prefer to receive comfort when you're upset?",
+                "What's your favorite thing about our emotional connection?"
             ],
             "💞 Relationship Reflection": [
-                "How have we grown as a couple in the past few months?",
-                "What's something you've learned about me that surprised you (in a good way)?",
+                "What's one thing we've learned about each other recently?",
+                "How have we grown as a couple this month?",
+                "What's your favorite memory of us from this week?",
+                "What challenge have we overcome together?",
+                "How do we handle disagreements well?",
+                "What's something we do that makes us unique as a couple?",
+                "What tradition would you like us to start?",
                 "How do we bring out the best in each other?",
-                "What do you envision our relationship looking like one year from now?",
-                "What kind of marriage do you want to build one day?"
+                "What's one thing you admire about how we communicate?",
+                "What makes our relationship special to you?"
+            ],
+            "🌿 Gratitude + Joy": [
+                "What's something small I did that meant a lot to you?",
+                "What made you laugh recently?",
+                "What are you most grateful for in our relationship?",
+                "What's a simple pleasure we enjoy together?",
+                "How do we create joy in ordinary moments?",
+                "What's your favorite way we spend time together?",
+                "What's something about me that always makes you smile?",
+                "What blessing in our relationship surprised you?",
+                "How do we celebrate each other well?",
+                "What's one thing that makes you excited about our future?"
+            ],
+            "🕊 Growth + Purpose": [
+                "How are you growing personally right now?",
+                "What's one goal you're working toward?",
+                "How can I encourage you in your dreams?",
+                "What's something new you want to learn or try?",
+                "How do you see us growing together?",
+                "What's one way we can challenge each other positively?",
+                "What purpose do you feel God has for our relationship?",
+                "How can we better support each other's individual callings?",
+                "What's one area where you want to grow spiritually?",
+                "How do we balance personal growth with growing together?"
+            ],
+            "💬 Emotional Intimacy + Healing": [
+                "What helps you feel emotionally safe with me?",
+                "How do you usually respond when you're hurt or misunderstood?",
+                "What's something that comforts you when you're having a rough day?",
+                "How can I show more empathy when you're struggling?",
+                "What do you need from me when you're feeling distant or disconnected?",
+                "What past experience shaped how you handle emotions today?",
+                "How can we be more honest about our needs without fear of judgment?",
+                "What does emotional healing look like to you right now?",
+                "How do you feel loved when you're having an off day?",
+                "What's something that triggers your stress or insecurity, and how can I support you in it?",
+                "How can we remind each other of truth when lies or fears creep in?",
+                "What has God healed in your heart since we've been together?",
+                "How can I help you feel seen and valued more deeply?",
+                "What does \"feeling safe\" emotionally mean for you in a relationship?",
+                "How do you prefer to receive comfort—through words, prayer, or presence?",
+                "What's one childhood experience that still affects how you love today?",
+                "How can we better handle misunderstandings or miscommunication?",
+                "What's a way we can grow in emotional maturity together?",
+                "What are some emotional boundaries that help you feel secure?",
+                "What does forgiveness look like for you when you're hurt?",
+                "How can we keep a soft heart toward each other even when frustrated?",
+                "What emotion is hardest for you to express, and why?",
+                "What helps you come back to peace when you feel overwhelmed?",
+                "How can I pray for your emotional healing right now?",
+                "How has God helped you overcome past emotional wounds?",
+                "What does vulnerability look like for you, and what makes it easier?",
+                "How can we create a \"judgment-free\" space when we share hard things?",
+                "What's something you're learning to let go of emotionally?",
+                "When do you feel most emotionally connected to me?",
+                "How can we remind each other of our worth when we forget?",
+                "What's one fear about love or commitment that you're still healing from?",
+                "How can we respond with grace instead of reacting when we're upset?",
+                "What helps you feel reassured of my love during conflict or distance?",
+                "What's one way we can protect our peace as a couple?",
+                "How can I show you more patience when you're processing something heavy?",
+                "What do you need most from me when you're anxious or worried?",
+                "How can we remind each other that healing is a journey, not a race?",
+                "What helps you open up emotionally and share what's really on your heart?",
+                "How can we let God lead our emotional healing process together?",
+                "What does unconditional love look like to you — from God, and from me?"
+            ],
+            "🕊️ Communication + Conflict": [
+                "What helps you feel heard and understood in a conversation?",
+                "When conflict happens, what's the best way for me to approach you?",
+                "What makes it hard for you to open up sometimes?",
+                "How do you usually respond when you feel misunderstood?",
+                "What's a healthy way we can take breaks during heated moments?",
+                "How can we make our communication more gentle but still honest?",
+                "What are some words or tones that feel triggering or discouraging for you?",
+                "How can I make it easier for you to express your needs?",
+                "What's something I can say or do that helps you feel reassured after conflict?",
+                "How can we both listen better when we disagree?",
+                "What helps you feel emotionally safe during hard conversations?",
+                "How can we make sure we're addressing issues quickly instead of letting them build up?",
+                "What's something you appreciate about how I communicate?",
+                "How do you usually process your emotions before bringing them up?",
+                "What's a communication habit we could both improve on?",
+                "How can we remind each other that we're on the same team during conflict?",
+                "What does \"speaking the truth in love\" look like to you?",
+                "How can I respond with more patience when you're upset?",
+                "How can we show grace even when one of us messes up or says something wrong?",
+                "What helps you calm down when emotions feel high?",
+                "How do you prefer to handle disagreements — in the moment or after cooling off?",
+                "What's a phrase or response that instantly helps you feel at ease?",
+                "How can we make space to talk about our expectations openly?",
+                "How do you usually feel after we resolve conflict?",
+                "What's one thing I could say differently that would help communication flow better?",
+                "How do you feel God wants us to handle disagreement as a couple?",
+                "How can we invite God into our communication more intentionally?",
+                "What do you think we've learned about each other through past conflicts?",
+                "How can we avoid miscommunication when we text or FaceTime?",
+                "What's one thing I do that makes you feel truly listened to?",
+                "What does humility look like for you in a disagreement?",
+                "How can I better express my appreciation when you communicate well?",
+                "How do you prefer to express your love or apology after an argument?",
+                "How can we practice active listening — not just waiting to respond?",
+                "What's one phrase or question that helps you open up when you're quiet?",
+                "How do you feel we've grown in communication since the beginning?",
+                "What does it look like to resolve conflict in a way that honors God?",
+                "What's one area of communication where we can give each other more grace?",
+                "How can I be more intentional in understanding your perspective?",
+                "How do we make sure we always leave conversations with peace, not tension?"
+            ],
+            "🌱 Discovering God's Purpose for Us": [
+                "Why do we believe God brought us together?",
+                "What unique gifts or qualities do we each bring into this relationship?",
+                "How do our individual callings complement each other?",
+                "What moments have confirmed that God's hand is on our relationship?",
+                "In what ways do we want our relationship to reflect Christ to others?",
+                "What are some dreams or visions we've each had for our future that align with Kingdom purpose?",
+                "How do we feel the Holy Spirit uses us together to impact others?",
+                "What's one area we both feel called to serve in (church, community, creative work, etc.)?",
+                "How do we define \"purpose\" as a couple — and is it centered on God or ourselves?",
+                "How can we keep God at the center of our purpose together?"
+            ],
+            "🔥 Strengthening Our Individual Callings": [
+                "How can we better support each other's personal callings and passions?",
+                "What does it look like to celebrate, not compete with, each other's gifts?",
+                "How do we balance being a team while still walking out individual assignments from God?",
+                "What fears or insecurities hold us back from fully walking in our callings?",
+                "How can we pray over each other's dreams and goals more intentionally?",
+                "How do we respond when one of us feels \"stuck\" or uncertain in our purpose?",
+                "What's one way we can encourage each other when discouragement or comparison hits?",
+                "What would it look like to truly believe we're both chosen and anointed for different things?",
+                "How can we create more space for each other to grow spiritually and creatively?",
+                "How can we protect our time and energy so we don't burn out while serving?"
+            ],
+            "🌍 Building a Kingdom Vision Together": [
+                "What kind of legacy do we want to leave behind as a couple?",
+                "How can we use our relationship to point others to Jesus?",
+                "What are some ways we can serve together — whether in ministry, business, or community?",
+                "What kind of atmosphere do we want our future home or marriage to carry?",
+                "How can we steward our finances, resources, and time to honor God's purpose for us?",
+                "If God gave us a shared mission, what do we think it would be?",
+                "How can we prepare our hearts now for the kind of purpose-driven marriage we desire?",
+                "What would it look like to dream with God, not just for ourselves?",
+                "How do we want to show up as a couple in our church or community?",
+                "How can we ensure that our goals align with Kingdom values and not worldly success?"
+            ],
+            "💖 Surrender, Obedience + Trust": [
+                "How can we surrender our plans and timelines to God together?",
+                "What does obedience look like for us in this season of our relationship?",
+                "How can we seek God for direction when we feel uncertain about our next steps?",
+                "How can we make prayer and discernment part of every major decision we make together?",
+                "How can we remind each other that purpose is more about who we become than what we do?",
+                "How can we stay grounded in faith when we don't see the full picture yet?",
+                "How can we use this season of waiting or distance to prepare for what's ahead?",
+                "What boundaries or habits help us stay focused on God's will over our own desires?",
+                "How do we want to handle it when one of us feels called in a direction that stretches our comfort zone?",
+                "What do we believe God wants to do through our love story for His glory?"
+            ],
+            "🌿 Understanding Conflict": [
+                "How do you usually feel when we disagree, and why?",
+                "What triggers your defensiveness in arguments?",
+                "How can I approach conflict in a way that makes you feel safe?",
+                "When you're upset, what helps you calm down before we talk?",
+                "How do you prefer to process hurt — immediately or with time?",
+                "What's one thing I could do differently during disagreements to show love?",
+                "How do past experiences affect how we handle conflict today?",
+                "When do you feel most heard during a disagreement?",
+                "How can we identify patterns in our conflicts before they escalate?",
+                "What role does pride play in how we argue or forgive?"
+            ],
+            "💖 Emotional Healing Together": [
+                "What past wounds do I need to understand better to love you fully?",
+                "How can we create space to share pain without fear of judgment?",
+                "What hurts do we need to pray over together right now?",
+                "How do we know when we've truly healed from an argument or hurt?",
+                "What is one way we can practice patience with each other's emotional triggers?",
+                "How can we help each other release past hurts that affect our relationship?",
+                "What's one thing we can celebrate about how far we've come in emotional growth?",
+                "How can we stay mindful of each other's feelings during disagreements?",
+                "What spiritual practices help us heal together (prayer, fasting, worship, scripture)?",
+                "How can we remind each other that God is bigger than our mistakes?"
+            ],
+            "🌊 Forgiveness & Grace": [
+                "How can we forgive faster without holding onto resentment?",
+                "What does forgiveness feel like for you, and how can I honor that?",
+                "How can we show grace when one of us repeats a mistake?",
+                "What is one hurt I can release to God today for the sake of our relationship?",
+                "How do we prevent small misunderstandings from becoming major conflicts?",
+                "How can we practice humility when admitting we were wrong?",
+                "What does \"extending mercy\" look like in our day-to-day life together?",
+                "How can we avoid bringing past arguments into current discussions?",
+                "How do we rebuild trust after being hurt?",
+                "What scripture or prayer reminds us to forgive one another?"
+            ],
+            "🌟 Growing Through Challenges": [
+                "How can conflict strengthen our relationship instead of weaken it?",
+                "What lessons have we learned about each other through hard seasons?",
+                "How do we balance truth-telling and kindness in disagreements?",
+                "What role does prayer play in resolving tension between us?",
+                "How can we identify the root cause of repeated conflicts?",
+                "How do we ensure accountability without blame?",
+                "How can we celebrate breakthroughs in communication or forgiveness?",
+                "What practices help us restore peace after conflict (worship, journaling, scripture, prayer)?",
+                "How can we honor each other's feelings even when we don't fully understand them?",
+                "What is one area we can intentionally grow in forgiveness over the next month?"
+            ],
+            "🌿 Building Trust": [
+                "What helps you feel most secure in our relationship?",
+                "How do you usually know when you can trust someone fully?",
+                "What actions or words make you feel unsafe emotionally?",
+                "How can we rebuild trust if it's ever shaken?",
+                "What small acts of faithfulness make a big difference to you?",
+                "How can I prove reliability to you in practical ways?",
+                "When have you felt the deepest trust with me, and why?",
+                "How do we balance independence and trust in our relationship?",
+                "What fears do we need to give to God to grow trust?",
+                "How can we intentionally celebrate each act of loyalty or honesty?"
+            ],
+            "💖 Creating Emotional Safety": [
+                "What behaviors help you feel comfortable sharing your heart?",
+                "How can I create space for you to speak without interruption or judgment?",
+                "How do we respond when one of us shares something vulnerable?",
+                "What is a safe word or phrase we could use to pause tense moments?",
+                "How can we make our disagreements feel safe instead of threatening?",
+                "What boundaries help you feel respected and secure?",
+                "How can we remind each other that our hearts are sacred?",
+                "What daily practices help cultivate emotional safety between us?",
+                "How do we handle criticism in a way that strengthens rather than harms?",
+                "How can we build a habit of listening with empathy first, advice second?"
+            ],
+            "🌊 Practicing Vulnerability": [
+                "What's a fear you've never shared with me but want to?",
+                "How can we be honest about feelings without fear of hurting each other?",
+                "What makes it easy for you to open up emotionally?",
+                "How do we create space for sharing dreams, fears, and insecurities?",
+                "What's one small vulnerability I can practice this week with you?",
+                "How can we support each other when opening up feels scary?",
+                "What past experiences make vulnerability difficult for you?",
+                "How can we honor God while being fully transparent with each other?",
+                "How does vulnerability strengthen our emotional and spiritual connection?",
+                "How can we encourage each other to be brave in sharing inner thoughts?"
+            ],
+            "🌟 Deepening Connection Through Trust": [
+                "How can we remind each other that God is the ultimate protector of our hearts?",
+                "What role does faith play in feeling secure with each other?",
+                "How can we celebrate trust milestones in our relationship?",
+                "What habits can help us maintain transparency and honesty daily?",
+                "How can we better support each other when one of us is anxious or fearful?",
+                "How do we balance personal boundaries with openness?",
+                "How can we reflect Christ's love in the ways we trust one another?",
+                "What is one way I can show you that your heart is safe with me?",
+                "How do we respond to mistakes or misunderstandings in a way that builds trust?",
+                "How can we continue to grow in vulnerability and intimacy as our relationship deepens?"
+            ],
+            "🌿 Gratitude for Each Other": [
+                "What is one thing you're grateful for about me today?",
+                "When have I made you feel truly appreciated recently?",
+                "What small gestures of love do you notice but might not say out loud?",
+                "How do we celebrate each other's victories, big or small?",
+                "What is a quality in me that you are thankful God placed in your life?",
+                "How can we express gratitude to each other daily?",
+                "What's one memory of us that fills you with gratitude?",
+                "How has our relationship helped you grow closer to God?",
+                "What blessings in our relationship do we often take for granted?",
+                "How do you feel when I notice and affirm your efforts?"
+            ],
+            "💖 Joy in the Everyday": [
+                "What's a moment this week that made you laugh or smile because of me?",
+                "How can we create more moments of joy even during stressful times?",
+                "What small things in our relationship bring you the most happiness?",
+                "When do you feel carefree and light-hearted with me?",
+                "How can we infuse fun into routine activities together?",
+                "What's one thing we can do this week just for fun?",
+                "How do you feel when we celebrate life's little wins together?",
+                "What is a favorite inside joke or shared memory that always brings joy?",
+                "How does laughter and play strengthen our connection?",
+                "How can we remind each other to enjoy the present moment more?"
+            ],
+            "🌊 Adventures + Fun Together": [
+                "What's one fun date idea we've always wanted to try?",
+                "How can we incorporate adventure into our weekends or evenings?",
+                "What hobbies or activities can we explore together to grow closer?",
+                "How do we support each other's playful, creative sides?",
+                "What's a new skill or experience we could try as a couple?",
+                "How do shared experiences strengthen our bond?",
+                "What's one spontaneous thing we could do to make each other smile?",
+                "How can we celebrate milestones in fun, meaningful ways?",
+                "What's your favorite way to make me laugh or smile?",
+                "How can we keep fun and play alive even when life feels heavy?"
+            ],
+            "🌟 Gratitude + Joy in God Together": [
+                "What blessings in our relationship remind you of God's goodness?",
+                "How can we thank God together for our love and connection?",
+                "What's a favorite scripture that brings joy to our hearts as a couple?",
+                "How can we use moments of laughter to reflect God's joy in our relationship?",
+                "What's one way we can serve others together that will also bring us joy?",
+                "How can we celebrate answered prayers as a couple?",
+                "What spiritual victories or breakthroughs have made you grateful recently?",
+                "How can we worship God together in playful or creative ways?",
+                "What's one thing we can do daily to cultivate gratitude and joy as a couple?",
+                "How do shared smiles, laughter, and fun remind us of God's love?"
+            ],
+            "🌿 Personal Growth": [
+                "What's one area of your life where you've grown spiritually in the last year?",
+                "How have your past experiences shaped who you are today?",
+                "What is a habit or mindset you want to improve for God's glory?",
+                "How do you know when you're truly aligning your actions with your values?",
+                "What fear or insecurity are you learning to trust God with?",
+                "How can I encourage you in your personal growth journey?",
+                "When do you feel most proud of yourself spiritually or emotionally?",
+                "How do you celebrate small wins in your growth?",
+                "What scripture reminds you to keep pressing forward in personal development?",
+                "How has God used challenges to refine your character?"
+            ],
+            "💖 Growth as a Couple": [
+                "What is one lesson we've learned together this year that has strengthened our bond?",
+                "How can we support each other in becoming more Christlike?",
+                "What patterns in our relationship do we want to grow out of?",
+                "How can we challenge each other to step out of comfort zones for growth?",
+                "What does accountability look like in our relationship?",
+                "How do we handle constructive feedback in a loving way?",
+                "How can we celebrate growth milestones as a couple?",
+                "What spiritual practices can we adopt to grow closer together?",
+                "How do we ensure our individual growth doesn't create distance but strengthens connection?",
+                "What is one shared goal we can pursue for mutual growth this year?"
+            ],
+            "🌊 Self-Awareness + Reflection": [
+                "What are my triggers, and how can I communicate them to you better?",
+                "How can I be more mindful of my words and actions toward you?",
+                "What strengths do I bring to our relationship that I sometimes take for granted?",
+                "What areas of myself do I still need to surrender fully to God?",
+                "How do I respond to stress, and how can you help me navigate it?",
+                "What are my blind spots in our relationship, and how can we address them?",
+                "How can I recognize and celebrate your growth without comparison?",
+                "What does emotional maturity look like in me, and how can I keep improving?",
+                "How do I want to show up differently for you in the next season of our relationship?",
+                "What habits help me stay self-aware and Spirit-led daily?"
+            ],
+            "🌟 Accountability + Vision": [
+                "How can we hold each other accountable without shame or judgment?",
+                "What's one boundary we can set to protect our growth individually and as a couple?",
+                "How do we recognize when we've fallen into old patterns and course-correct?",
+                "How can we ensure God remains central in our growth journey?",
+                "What goals can we set to grow spiritually, emotionally, and relationally together?",
+                "How do we encourage vulnerability while still fostering self-awareness?",
+                "How can we reflect on our progress regularly without discouragement?",
+                "What legacy do we want to leave as individuals and as a couple?",
+                "How can we celebrate progress, not just perfection?",
+                "What steps can we take together to ensure we're always growing closer to God and each other?"
             ]
         };
 
+        // Date night questions - 250+ romantic conversation starters
         const dateNightQuestions = [
-            // Faith & Spiritual Connection (50 questions)
-            "If you could ask God one question about our relationship, what would it be?",
-            "What's one way you see God's hand in bringing us together?",
-            "How do you want us to pray together as a couple?",
-            "What Bible verse do you think describes our love story?",
-            "If we could serve God together anywhere in the world, where would you choose?",
-            "What's a spiritual goal you have for us this year?",
-            "How has your faith grown since we've been together?",
-            "What's your favorite way to worship God together?",
-            "If we wrote a prayer for our relationship, what would it say?",
-            "What Christian couple do you most admire and why?",
-            "How do you see us honoring God in our daily life together?",
-            "What's one way I help you grow closer to Jesus?",
-            "If we could ask a biblical couple for relationship advice, who would it be?",
-            "What does 'equally yoked' mean to you in our relationship?",
-            "How do you want us to handle disagreements in a Christ-like way?",
-            "What's your favorite thing about praying with me?",
-            "If we could lead a ministry together, what would it be?",
-            "How do you see God using our relationship to impact others?",
-            "What's a worship song that reminds you of us?",
-            "How do you want us to celebrate God's goodness together?",
-            "What's one way we can better support each other's spiritual growth?",
-            "If we could have dinner with any Christian leader, who would it be?",
-            "What does it mean to you to have a godly relationship?",
-            "How do you see us encouraging other couples in their faith?",
-            "What's your favorite Bible story about love or marriage?",
-            "How do you want us to handle stress in a way that honors God?",
-            "What's one spiritual discipline you'd like us to do together?",
-            "If we could plant a church together, what would it focus on?",
-            "How has God used you to bless my life?",
-            "What's your vision for our family's spiritual legacy?",
+            "What's your favorite memory of us?",
+            "How do you feel most loved by me?",
+            "What dream do we share for our future?",
+            "What's something new you'd like to try together?",
+            "How can we make our relationship even stronger?",
+            "What's your favorite thing about our connection?",
+            "What adventure would you love to go on with me?",
+            "How do we bring out the best in each other?",
+            "What tradition would you like us to start?",
+            "What makes you most excited about our future?",
+            "How do you feel when we pray together?",
+            "What's your favorite way we spend quality time?",
+            "What's something you admire about my character?",
+            "How can we serve God together more?",
+            "What's a goal we should pursue as a couple?",
+            "What's your favorite thing I do that shows love?",
+            "How do you see us growing spiritually together?",
+            "What's something you're grateful for about today?",
+            "What's a challenge we've overcome that made us stronger?",
+            "How do you feel God is blessing our relationship?",
+            "What's something you want to learn about me?",
+            "How can we create more joy in our everyday life?",
+            "What's your favorite way we connect emotionally?",
+            "What's something you appreciate about how we communicate?",
+            "How do you feel when we worship together?",
+            "What's a way we can encourage each other more?",
+            "What's your favorite physical expression of our love?",
+            "How do you see our love reflecting Christ's love?",
+            "What's something you want us to pray about together?",
+            "What's your favorite thing about our spiritual connection?",
+            "How do you feel when we read the Bible together?",
+            "What's a way we can grow in intimacy?",
+            "What's something you love about our friendship?",
+            "How do you feel when we laugh together?",
+            "What's your favorite way we show affection?",
+            "What's something you want to experience with me?",
+            "How do you feel when we share our hearts openly?",
+            "What's your favorite thing about our physical connection?",
+            "How do you see us impacting others for Christ?",
+            "What's something you love about our emotional bond?",
+            "How do you feel when we dream about the future together?",
+            "What's your favorite way we resolve conflicts?",
+            "What's something you appreciate about my love for you?",
+            "How do you feel when we serve others together?",
+            "What's your favorite thing about our conversations?",
+            "What's a way we can deepen our spiritual intimacy?",
+            "How do you feel when we share our struggles honestly?",
+            "What's something you love about our partnership?",
+            "What's your favorite way we celebrate each other?",
+            "How do you see God using our relationship for His glory?",
+            "What's something that makes you feel secure in our love?",
+            "How do you feel when we support each other's dreams?",
+            "What's your favorite thing about our journey together?",
+            "What's a way we can grow in grace toward each other?",
+            "How do you feel when we forgive each other quickly?",
+            "What's something you love about our commitment?",
+            "What's your favorite way we show respect to each other?",
             "How do you see us growing in wisdom together?",
-            "What's one way we can better love our neighbors as a couple?",
-            "If we could write a devotional together, what would the theme be?",
-            "How do you want us to handle success in a humble way?",
-            "What's your favorite thing about studying the Bible together?",
-            "How do you see God preparing us for marriage?",
-            "What's one way we can better steward the gifts God has given us?",
-            "If we could go on a mission trip together, where would we go?",
-            "How do you want us to celebrate the Sabbath as a couple?",
-            "What's your favorite way to see God's creation together?",
-            "How do you see us encouraging each other during difficult seasons?",
-            "What's one way we can better practice hospitality together?",
-            "If we could memorize a book of the Bible together, which would it be?",
-            "How do you want us to handle money in a way that honors God?",
-            "What's your favorite thing about our spiritual conversations?",
-            "How do you see us growing in patience and kindness together?",
-            "What's one way we can better serve our community as a couple?",
-            "If we could start a tradition to honor God, what would it be?",
-            "How do you want us to celebrate God's faithfulness in our relationship?",
-            "What's your vision for how we'll raise children in the faith?",
-
-            // Dreams & Future (50 questions)
-            "How do you think our love story will be different in 10 years?",
-            "What's one dream you have that you've never told anyone?",
-            "If we could live anywhere in the world for a year, where would it be?",
-            "What does your ideal Sunday morning look like with me?",
-            "If money wasn't a factor, what would you want to do with your life?",
-            "What's one adventure you want us to go on together?",
-            "How do you picture our home looking in 5 years?",
-            "What's a skill you'd love for us to learn together?",
-            "If we could start a business together, what would it be?",
-            "What's your biggest hope for our relationship?",
-            "How many children do you want, and what would you name them?",
-            "What's one place you want to travel with me before we're 30?",
-            "If we could build our dream house, what would be the most important room?",
-            "What's a tradition you want to start in our family?",
-            "How do you want to celebrate our 50th wedding anniversary?",
-            "What's one way you want to make the world better together?",
-            "If we could retire anywhere, where would you choose?",
-            "What's your vision for how we'll spend our golden years?",
-            "What's one goal you have for us to accomplish this year?",
-            "If we could take a year off to pursue a passion, what would it be?",
-            "What's your dream vacation with me?",
-            "How do you want us to handle career changes and big decisions?",
-            "What's one way you want us to stay connected as we get older?",
-            "If we could learn any language together, which would it be?",
-            "What's your vision for our family's Christmas traditions?",
-            "How do you want us to celebrate each other's achievements?",
-            "What's one hobby you'd love for us to share?",
-            "If we could write a book together, what would it be about?",
-            "What's your dream for how we'll support each other's careers?",
-            "How do you picture us staying young at heart together?",
-            "What's one way you want us to invest in our community long-term?",
-            "If we could have any pet together, what would it be?",
-            "What's your vision for how we'll handle aging parents?",
-            "How do you want us to celebrate milestone birthdays?",
-            "What's one legacy you want us to leave together?",
-            "If we could take a class together, what would you choose?",
-            "What's your dream for our wedding day (or renewal of vows)?",
-            "How do you want us to handle life's unexpected challenges?",
-            "What's one way you want us to stay playful throughout our marriage?",
-            "If we could volunteer together regularly, what cause would you choose?",
-            "What's your vision for how we'll make decisions as a team?",
-            "How do you want us to celebrate our love story each year?",
-            "What's one adventure sport or activity you'd try with me?",
-            "If we could have a second home anywhere, where would it be?",
-            "What's your dream for how we'll handle disagreements?",
-            "How do you want us to surprise each other throughout our marriage?",
-            "What's one way you want us to keep learning and growing together?",
-            "If we could start a family foundation, what would it support?",
-            "What's your vision for how we'll stay best friends forever?",
-            "How do you want us to create new memories every year?",
-
-            // Deep Connection & Understanding (50 questions)
-            "What's one thing about me that you hope never changes?",
-            "What's the most romantic thing someone could do that doesn't cost any money?",
-            "When do you feel most loved by me?",
-            "What's one way I make you feel safe and secure?",
-            "What's your favorite memory of us so far?",
-            "How do you prefer to be comforted when you're upset?",
-            "What's one thing you've learned about love from our relationship?",
-            "What makes you feel most appreciated in our relationship?",
-            "What's your favorite way for us to spend quality time together?",
-            "How do you know when I'm really listening to you?",
-            "What's one way I've helped you become a better person?",
-            "What does intimacy mean to you beyond the physical?",
-            "What's your favorite thing about how we communicate?",
-            "How do you like to be encouraged when you're facing challenges?",
-            "What's one way we bring out the best in each other?",
-            "What makes you feel most connected to me?",
-            "What's your favorite way for me to show affection?",
-            "How do you prefer to resolve conflicts with me?",
-            "What's one thing about our relationship that makes you smile?",
-            "What makes you feel most understood by me?",
-            "What's your favorite way for us to be spontaneous together?",
-            "How do you like to celebrate good news with me?",
-            "What's one way I support your dreams and goals?",
-            "What makes you feel most cherished in our relationship?",
-            "What's your favorite inside joke or memory we share?",
-            "How do you prefer to spend quiet moments together?",
-            "What's one way our relationship has surprised you?",
-            "What makes you feel most grateful for our love?",
-            "What's your favorite way for us to be silly together?",
-            "How do you like to be reassured when you're feeling insecure?",
-            "What's one thing about our chemistry that you love?",
-            "What makes you feel most proud of our relationship?",
-            "What's your favorite way for us to support each other's growth?",
-            "How do you prefer to share your feelings with me?",
-            "What's one way our love has changed you for the better?",
-            "What makes you feel most excited about our future?",
-            "What's your favorite way for us to be romantic?",
-            "How do you like to be surprised by me?",
-            "What's one thing about our partnership that you treasure?",
-            "What makes you feel most confident in our relationship?",
-            "What's your favorite way for us to laugh together?",
-            "How do you prefer to handle stress as a couple?",
-            "What's one way I make ordinary moments special?",
-            "What makes you feel most hopeful about our love?",
-            "What's your favorite way for us to be adventurous together?",
-            "How do you like to be pampered or cared for by me?",
-            "What's one thing about our love story that you'd never change?",
-            "What makes you feel most blessed to be with me?",
-            "What's your favorite way for us to create new traditions?",
-            "How do you prefer to end each day together?",
-
-            // Personal Growth & Values (50 questions)
-            "What's one fear you're working on overcoming?",
-            "What does success mean to you in life?",
-            "What's a childhood dream you still think about?",
-            "How do you want to be remembered by others?",
-            "What's one way you've grown in the past year?",
-            "What values are most important to you in a relationship?",
-            "What's something you're really proud of about yourself?",
-            "How do you handle stress, and how can I support you?",
-            "What's one habit you'd like to develop or break?",
-            "What makes you feel most confident and empowered?",
-            "What's your biggest strength, and how do you use it?",
-            "How do you prefer to recharge when you're feeling drained?",
-            "What's one lesson life has taught you that you'd share with others?",
-            "What does forgiveness mean to you?",
-            "What's something you're currently learning about yourself?",
-            "How do you define a life well-lived?",
-            "What's one way you want to challenge yourself this year?",
-            "What makes you feel most fulfilled and purposeful?",
-            "What's your approach to making difficult decisions?",
-            "How do you handle disappointment or setbacks?",
-            "What's one thing you wish more people understood about you?",
-            "What does loyalty mean to you in relationships?",
-            "What's your biggest motivation in life right now?",
-            "How do you prefer to celebrate your accomplishments?",
-            "What's one way you want to make a difference in the world?",
-            "What does authenticity mean to you?",
-            "What's something you're passionate about that others might not know?",
-            "How do you maintain hope during difficult times?",
-            "What's one piece of advice you'd give your younger self?",
-            "What makes you feel most grateful in life?",
-            "What's your approach to setting and achieving goals?",
-            "How do you define true friendship?",
-            "What's one way you've learned to love yourself better?",
-            "What does courage look like in your daily life?",
-            "What's something you're excited to learn or try?",
-            "How do you handle criticism or feedback?",
-            "What's one way you want to grow spiritually this year?",
-            "What makes you feel most at peace?",
-            "What's your philosophy on work-life balance?",
-            "How do you prefer to help others in need?",
-            "What's one thing you've learned about resilience?",
-            "What does generosity mean to you?",
-            "What's something you're working on accepting about yourself?",
-            "How do you cultivate joy in your everyday life?",
-            "What's one way you want to be a better person?",
-            "What does wisdom mean to you?",
-            "What's something you're grateful your parents taught you?",
-            "How do you handle change and uncertainty?",
-            "What's one way you want to leave the world better than you found it?",
-            "What makes you feel most alive and energized?",
-
-            // Fun & Lighthearted (50 questions)
-            "If you could have any superpower for a day, what would it be?",
-            "What's the most embarrassing thing that's ever happened to you?",
-            "If you could be famous for something, what would it be?",
-            "What's your weirdest food combination that you actually love?",
-            "If you could live in any TV show or movie, which would you choose?",
-            "What's the funniest thing that's ever happened to us?",
-            "If you could have dinner with any three people, living or dead, who would they be?",
-            "What's your most irrational fear?",
-            "If you could instantly become an expert at something, what would it be?",
-            "What's the best compliment you've ever received?",
-            "If you could time travel, would you go to the past or future?",
-            "What's your guilty pleasure that you're not actually guilty about?",
-            "If you could switch lives with anyone for a week, who would it be?",
-            "What's the most spontaneous thing you've ever done?",
-            "If you could have any animal as a pet, what would it be?",
-            "What's your favorite way to waste time?",
-            "If you could eliminate one thing from daily life, what would it be?",
-            "What's the best gift you've ever given someone?",
-            "If you could add one room to our future house, what would it be?",
-            "What's your favorite childhood game or activity?",
-            "If you could master any instrument overnight, which would you choose?",
-            "What's the most beautiful place you've ever seen?",
-            "If you could have any job for just one day, what would it be?",
-            "What's your favorite way to make someone smile?",
-            "If you could bring back any fashion trend, what would it be?",
-            "What's the best advice you've ever received?",
-            "If you could have any fictional character as a best friend, who would it be?",
-            "What's your favorite family tradition or memory?",
-            "If you could invent something to make life easier, what would it be?",
-            "What's the most adventurous thing on your bucket list?",
-            "If you could have any view from your bedroom window, what would it be?",
-            "What's your favorite way to celebrate small victories?",
-            "If you could be really good at any sport, which would you choose?",
-            "What's the kindest thing a stranger has ever done for you?",
-            "If you could have any magical ability, what would it be?",
-            "What's your favorite thing about your personality?",
-            "If you could redesign the human body, what would you change?",
-            "What's the most interesting conversation you've ever had?",
-            "If you could have any celebrity as a neighbor, who would it be?",
-            "What's your favorite way to surprise people?",
-            "If you could live in any historical time period, when would it be?",
-            "What's the most creative thing you've ever done?",
-            "If you could have any question answered, what would you ask?",
-            "What's your favorite thing about being your age right now?",
-            "If you could change one thing about how you were raised, what would it be?",
-            "What's the most meaningful gift you've ever received?",
-            "If you could have any talent that you don't currently have, what would it be?",
-            "What's your favorite way to make an ordinary day special?",
-            "If you could give everyone in the world one piece of advice, what would it be?",
-            "What's the best thing about being in love with me?"
+            "What's something you appreciate about our teamwork?",
+            "What's your favorite thing about our love story?",
+            "How do you feel when we choose each other daily?",
+            "What's a way we can honor God more in our relationship?",
+            "What's something you love about our unity?",
+            "How do you feel when we face challenges together?",
+            "What's your favorite thing about our covenant love?",
+            "What's a way we can grow in selflessness?",
+            "How do you feel when we put each other first?",
+            "What's something you love about our faithfulness?",
+            "What's your favorite way we build each other up?",
+            "How do you see us reflecting God's heart together?",
+            "What's something that makes our love unique?",
+            "How do you feel when we choose joy together?",
+            "What's your favorite thing about our hope in Christ?",
+            "What's a way we can grow in patience with each other?",
+            "How do you feel when we trust God with our relationship?",
+            "What's something you love about our peace together?",
+            "What's your favorite way we encourage each other's faith?",
+            "How do you see us growing in Christ-like love?",
+            "What's something that makes you thankful for our bond?",
+            "How do you feel when we surrender our plans to God?",
+            "What's your favorite thing about our spiritual journey?",
+            "What's a way we can grow in humility together?",
+            "How do you feel when we seek God's will for us?",
+            "What's something you love about our obedience to God?",
+            "What's your favorite way we worship together?",
+            "How do you see us growing in holiness?",
+            "What's something that makes you confident in our future?",
+            "How do you feel when we walk in God's purposes?",
+            "What's your favorite thing about our calling together?",
+            "What's a way we can grow in spiritual maturity?",
+            "How do you feel when we align our hearts with God's?",
+            "What's something you love about our mission together?",
+            "What's your favorite way we point others to Jesus?",
+            "How do you see us leaving a godly legacy?",
+            "What's something that makes you excited about eternity with me?",
+            "How do you feel when we live for God's glory together?",
+            "What's your favorite thing about our eternal perspective?",
+            "What's a way we can grow in kingdom-mindedness?",
+            "How do you feel when we invest in what matters to God?",
+            "What's something you love about our heavenly focus?",
+            "What's your favorite way we store up treasures in heaven?",
+            "How do you see us growing in eternal significance?",
+            "What's something that makes our love feel sacred?",
+            "How do you feel when we honor God with our relationship?",
+            "What's your favorite thing about our covenant before God?",
+            "What's a way we can grow in reverence for our calling?",
+            "How do you feel when we steward our love well?",
+            "What's something you love about our holy partnership?",
+            "What's your favorite way we reflect the Trinity's love?",
+            "How do you see us growing in divine love?",
+            "What's something that makes our bond feel eternal?",
+            "How do you feel when we love like Christ loves?",
+            "What's your favorite thing about our sacrificial love?",
+            "What's a way we can grow in unconditional love?",
+            "How do you feel when we choose love over self?",
+            "What's something you love about our selfless devotion?",
+            "What's your favorite way we lay down our lives for each other?",
+            "How do you see us growing in Christ-centered love?",
+            "What's something that makes our love feel transformative?",
+            "How do you feel when we let God's love flow through us?",
+            "What's your favorite thing about our Spirit-filled connection?",
+            "What's a way we can grow in supernatural love?",
+            "How do you feel when we love beyond our human capacity?",
+            "What's something you love about our God-empowered bond?",
+            "What's your favorite way we experience divine love together?",
+            "How do you see us growing in heavenly love?",
+            "What's something that makes our love feel miraculous?",
+            "How do you feel when we witness God's love in our relationship?",
+            "What's your favorite thing about our blessed union?",
+            "What's a way we can grow in grateful love?",
+            "How do you feel when we recognize God's gifts in each other?",
+            "What's something you love about our thankful hearts?",
+            "What's your favorite way we celebrate God's goodness together?",
+            "How do you see us growing in appreciative love?",
+            "What's something that makes you overflow with gratitude for us?",
+            "How do you feel when we count our blessings together?",
+            "What's your favorite thing about our joy-filled love?",
+            "What's a way we can grow in celebratory love?",
+            "How do you feel when we rejoice in God's faithfulness to us?",
+            "What's something you love about our victorious partnership?",
+            "What's your favorite way we triumph together in Christ?",
+            "How do you see us growing in overcoming love?",
+            "What's something that makes you confident we can face anything together?",
+            "How do you feel when we stand strong in God's strength?",
+            "What's your favorite thing about our unshakeable foundation?",
+            "What's a way we can grow in resilient love?",
+            "How do you feel when we weather storms together?",
+            "What's something you love about our enduring commitment?",
+            "What's your favorite way we persevere through challenges?",
+            "How do you see us growing in steadfast love?",
+            "What's something that makes our bond feel unbreakable?",
+            "How do you feel when we choose each other through everything?",
+            "What's your favorite thing about our faithful love?",
+            "What's a way we can grow in loyal devotion?",
+            "How do you feel when we prove our commitment daily?",
+            "What's something you love about our reliable partnership?",
+            "What's your favorite way we show up for each other?",
+            "How do you see us growing in dependable love?",
+            "What's something that makes you trust our future completely?",
+            "How do you feel when we build our relationship on solid ground?",
+            "What's your favorite thing about our secure connection?",
+            "What's a way we can grow in confident love?",
+            "How do you feel when we rest in God's plan for us?",
+            "What's something you love about our peaceful assurance?",
+            "What's your favorite way we find rest in each other?",
+            "How do you see us growing in trusting love?",
+            "What's something that makes you feel completely safe with me?",
+            "How do you feel when we create a haven together?",
+            "What's your favorite thing about our protective love?",
+            "What's a way we can grow in sheltering each other?",
+            "How do you feel when we guard each other's hearts?",
+            "What's something you love about our nurturing care?",
+            "What's your favorite way we tend to each other's souls?",
+            "How do you see us growing in healing love?",
+            "What's something that makes our relationship feel restorative?",
+            "How do you feel when we help each other flourish?",
+            "What's your favorite thing about our life-giving bond?",
+            "What's a way we can grow in empowering each other?",
+            "How do you feel when we call out the best in one another?",
+            "What's something you love about our encouraging partnership?",
+            "What's your favorite way we inspire each other to grow?",
+            "How do you see us growing in uplifting love?",
+            "What's something that makes you feel truly seen by me?",
+            "How do you feel when we celebrate each other's uniqueness?",
+            "What's your favorite thing about our affirming connection?",
+            "What's a way we can grow in honoring each other?",
+            "How do you feel when we treasure what makes each other special?",
+            "What's something you love about our appreciative hearts?",
+            "What's your favorite way we value each other deeply?",
+            "How do you see us growing in cherishing love?",
+            "What's something that makes you feel precious to me?",
+            "How do you feel when we treat each other as God's masterpiece?",
+            "What's your favorite thing about our reverent love?",
+            "What's a way we can grow in sacred appreciation?",
+            "How do you feel when we handle each other's hearts with care?",
+            "What's something you love about our gentle tenderness?",
+            "What's your favorite way we show delicate affection?",
+            "How do you see us growing in tender love?",
+            "What's something that makes our touch feel holy?",
+            "How do you feel when we express love through gentle gestures?",
+            "What's your favorite thing about our soft-hearted connection?",
+            "What's a way we can grow in compassionate love?",
+            "How do you feel when we respond to each other with mercy?",
+            "What's something you love about our gracious spirits?",
+            "What's your favorite way we extend kindness to each other?",
+            "How do you see us growing in benevolent love?",
+            "What's something that makes our hearts feel intertwined?",
+            "How do you feel when we move as one in spirit?",
+            "What's your favorite thing about our unified purpose?",
+            "What's a way we can grow in harmonious love?",
+            "How do you feel when we blend our lives beautifully?",
+            "What's something you love about our synchronized hearts?",
+            "What's your favorite way we create music together in life?",
+            "How do you see us growing in melodious partnership?",
+            "What's something that makes our relationship feel like a dance?",
+            "How do you feel when we move in perfect rhythm together?",
+            "What's your favorite thing about our graceful connection?",
+            "What's a way we can grow in elegant love?",
+            "How do you feel when we express beauty through our bond?",
+            "What's something you love about our artistic partnership?",
+            "What's your favorite way we create something beautiful together?",
+            "How do you see us growing in creative love?",
+            "What's something that makes our relationship feel like poetry?",
+            "How do you feel when we write our love story together?",
+            "What's your favorite thing about our romantic narrative?",
+            "What's a way we can grow in storytelling love?",
+            "How do you feel when we craft memories that will last forever?",
+            "What's something you love about our legacy of love?",
+            "What's your favorite way we build something eternal together?",
+            "How do you see us growing in timeless love?",
+            "What's something that makes our bond feel infinite?",
+            "How do you feel when we touch eternity through our connection?",
+            "What's your favorite thing about our everlasting love?",
+            "What's a way we can grow in eternal perspective together?",
+            "How do you feel when we love with forever in mind?",
+            "What's something you love about our undying devotion?",
+            "What's your favorite way we invest in what will never fade?",
+            "How do you see us growing in imperishable love?",
+            "What's something that makes our relationship feel destined?",
+            "How do you feel when we walk in our divine calling together?",
+            "What's your favorite thing about our purposeful union?",
+            "What's a way we can grow in intentional love?",
+            "How do you feel when we align with God's perfect plan?",
+            "What's something you love about our ordained partnership?",
+            "What's your favorite way we fulfill our sacred mission together?",
+            "How do you see us growing in kingdom-purposed love?",
+            "What's something that makes our bond feel heaven-sent?",
+            "How do you feel when we recognize the miracle of our connection?",
+            "What's your favorite thing about our blessed love story?"
         ];
 
-        let currentView = 'login';
-        let currentDateNightIndex = 0;
-        let shuffledDateNightQuestions = [...dateNightQuestions];
-        let allQuestions = [];
-        let currentDailyQuestion = '';
-        let currentQuestionCategory = '';
-        let currentUser = null;
-        let partnerUser = null;
-        let coupleId = null;
-        let journalListener = null;
-        let profilePicData = null;
-
-        // Profile picture handling
-        function handleProfilePicUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Check file size (limit to 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                showMessage('Image must be smaller than 2MB', 'error');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                profilePicData = e.target.result;
-                const preview = document.getElementById('profilePicPreview');
-                preview.innerHTML = `<img src="${profilePicData}" alt="Profile Picture">`;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        async function handleNewProfilePicUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Check file size (limit to 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                showMessage('Image must be smaller than 2MB', 'error');
-                return;
-            }
-            
-            try {
-                showSyncStatus('syncing', 'Updating photo...');
-                
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    const newProfilePic = e.target.result;
-                    
-                    // Update in database
-                    const { doc, updateDoc } = window.firebaseModules;
-                    await updateDoc(doc(window.firebaseDb, 'users', currentUser.id), {
-                        profilePic: newProfilePic
-                    });
-                    
-                    // Update local data
-                    currentUser.profilePic = newProfilePic;
-                    
-                    // Update UI
-                    updateAllProfilePictures();
-                    
-                    showSyncStatus('synced', 'Photo updated!');
-                    showMessage('Profile picture updated successfully!', 'success');
-                };
-                reader.readAsDataURL(file);
-            } catch (error) {
-                console.error('Error updating profile picture:', error);
-                showSyncStatus('error', 'Update failed');
-                showMessage('Error updating profile picture: ' + error.message, 'error');
-            }
-        }
-
-        async function removeProfilePic() {
-            try {
-                showSyncStatus('syncing', 'Removing photo...');
-                
-                // Update in database
-                const { doc, updateDoc } = window.firebaseModules;
-                await updateDoc(doc(window.firebaseDb, 'users', currentUser.id), {
-                    profilePic: null
+        // Get all questions in order
+        function getAllQuestions() {
+            const allQuestions = [];
+            for (const [category, questions] of Object.entries(questionCategories)) {
+                questions.forEach(question => {
+                    allQuestions.push({ category, question });
                 });
-                
-                // Update local data
-                currentUser.profilePic = null;
-                
-                // Update UI
-                updateAllProfilePictures();
-                
-                showSyncStatus('synced', 'Photo removed!');
-                showMessage('Profile picture removed', 'success');
-            } catch (error) {
-                console.error('Error removing profile picture:', error);
-                showSyncStatus('error', 'Remove failed');
-                showMessage('Error removing profile picture: ' + error.message, 'error');
             }
+            return allQuestions;
         }
 
-        async function updateDisplayName() {
-            const newName = document.getElementById('displayNameInput').value.trim();
+        // Get today's question based on date
+        function getTodaysQuestion() {
+            const allQuestions = getAllQuestions();
+            const startDate = new Date('2024-01-01'); // Fixed start date for consistency
+            const today = new Date();
+            const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+            const questionIndex = daysSinceStart % allQuestions.length;
+            return allQuestions[questionIndex];
+        }
+
+        // Authentication functions
+        function toggleAuthMode() {
+            isSignUp = !isSignUp;
+            const submitBtn = document.getElementById('authSubmit');
+            const toggleBtn = document.getElementById('toggleAuth');
             
-            if (!newName) {
-                showMessage('Please enter a name', 'error');
-                return;
+            if (isSignUp) {
+                submitBtn.textContent = 'Sign Up';
+                toggleBtn.parentElement.innerHTML = 'Already have an account? <button type="button" id="toggleAuth">Sign in</button>';
+            } else {
+                submitBtn.textContent = 'Sign In';
+                toggleBtn.parentElement.innerHTML = 'Don\'t have an account? <button type="button" id="toggleAuth">Sign up</button>';
             }
             
-            if (newName === currentUser.name) {
-                showMessage('Name is already up to date', 'info');
-                return;
-            }
-            
+            document.getElementById('toggleAuth').addEventListener('click', toggleAuthMode);
+        }
+
+        async function handleAuth(email, password) {
             try {
-                showSyncStatus('syncing', 'Updating name...');
-                
-                // Update in database
-                const { doc, updateDoc } = window.firebaseModules;
-                await updateDoc(doc(window.firebaseDb, 'users', currentUser.id), {
-                    name: newName
-                });
-                
-                // Update local data
-                currentUser.name = newName;
-                
-                // Update UI everywhere
-                updateAllUserNames();
-                
-                showSyncStatus('synced', 'Name updated!');
-                showMessage('Display name updated successfully!', 'success');
-            } catch (error) {
-                console.error('Error updating display name:', error);
-                showSyncStatus('error', 'Update failed');
-                showMessage('Error updating name: ' + error.message, 'error');
-            }
-        }
-
-        function updateAllUserNames() {
-            // Update user profile in header
-            document.getElementById('userName').textContent = currentUser.name;
-            
-            // Update user avatar initials if no profile pic
-            const userAvatar = document.getElementById('userAvatar');
-            if (!currentUser.profilePic) {
-                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-            }
-            
-            // Update current user avatar in journal
-            const currentUserAvatar = document.getElementById('currentUserAvatar');
-            if (!currentUser.profilePic) {
-                currentUserAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-            }
-            
-            // Update settings view
-            const currentProfilePic = document.getElementById('currentProfilePic');
-            if (!currentUser.profilePic) {
-                currentProfilePic.textContent = currentUser.name.charAt(0).toUpperCase();
-            }
-        }
-
-        function updateAllProfilePictures() {
-            // Update user profile in header
-            const userAvatar = document.getElementById('userAvatar');
-            if (currentUser.profilePic) {
-                userAvatar.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
-            } else {
-                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-            }
-            
-            // Update current user avatar in journal
-            const currentUserAvatar = document.getElementById('currentUserAvatar');
-            if (currentUser.profilePic) {
-                currentUserAvatar.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
-            } else {
-                currentUserAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-            }
-            
-            // Update settings view
-            const currentProfilePic = document.getElementById('currentProfilePic');
-            const removeBtn = document.getElementById('removePhotoBtn');
-            if (currentUser.profilePic) {
-                currentProfilePic.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
-                removeBtn.style.display = 'block';
-            } else {
-                currentProfilePic.textContent = currentUser.name.charAt(0).toUpperCase();
-                removeBtn.style.display = 'none';
-            }
-        }
-
-        // Firebase helper functions
-        function showSyncStatus(status, message) {
-            const indicator = document.getElementById('syncIndicator');
-            const icon = document.getElementById('syncIcon');
-            const text = document.getElementById('syncText');
-            
-            indicator.className = 'sync-indicator';
-            
-            switch(status) {
-                case 'syncing':
-                    indicator.classList.add('syncing');
-                    icon.textContent = '🔄';
-                    text.textContent = message || 'Syncing...';
-                    break;
-                case 'synced':
-                    icon.textContent = '✅';
-                    text.textContent = message || 'Synced';
-                    break;
-                case 'error':
-                    indicator.classList.add('error');
-                    icon.textContent = '❌';
-                    text.textContent = message || 'Sync Error';
-                    break;
-            }
-            
-            indicator.classList.remove('hidden');
-            
-            if (status === 'synced') {
-                setTimeout(() => {
-                    indicator.classList.add('hidden');
-                }, 2000);
-            }
-        }
-
-        async function login() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!email || !password) {
-                showMessage('Please fill in all fields', 'error');
-                return;
-            }
-
-            try {
-                showSyncStatus('syncing', 'Signing in...');
-                const { signInWithEmailAndPassword } = window.firebaseModules;
-                const userCredential = await signInWithEmailAndPassword(window.firebaseAuth, email, password);
-                
-                // Get user data from Firestore
-                const { doc, getDoc } = window.firebaseModules;
-                const userDoc = await getDoc(doc(window.firebaseDb, 'users', userCredential.user.uid));
-                
-                if (userDoc.exists()) {
-                    currentUser = { id: userCredential.user.uid, ...userDoc.data() };
-                    showSyncStatus('synced', 'Signed in!');
-                    showMessage('Login successful!', 'success');
-                    setTimeout(() => showConnectionView(), 1000);
+                let userCredential;
+                if (isSignUp) {
+                    userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 } else {
-                    showSyncStatus('error', 'Profile not found');
-                    showMessage('User profile not found', 'error');
+                    userCredential = await auth.signInWithEmailAndPassword(email, password);
                 }
+                
+                currentUser = userCredential.user;
+                await initializeUserData();
+                showMainApp();
             } catch (error) {
-                console.error('Login error:', error);
-                showSyncStatus('error', 'Sign in failed');
-                showMessage('Invalid email or password', 'error');
+                showNotification(error.message, 'error');
             }
         }
 
-        async function signup() {
-            const name = document.getElementById('signupName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
+        async function initializeUserData() {
+            if (!currentUser) return;
             
-            if (!name || !email || !password) {
-                showMessage('Please fill in all required fields', 'error');
-                return;
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            
+            if (!userDoc.exists) {
+                // Generate unique couple code
+                const coupleCode = generateCoupleCode();
+                
+                // Create new user document
+                await db.collection('users').doc(currentUser.uid).set({
+                    email: currentUser.email,
+                    displayName: currentUser.email.split('@')[0],
+                    profilePicture: null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    coupleId: null,
+                    coupleCode: coupleCode
+                });
             }
-
-            try {
-                showSyncStatus('syncing', 'Creating account...');
-                const { createUserWithEmailAndPassword } = window.firebaseModules;
-                const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
-                
-                // Generate connection code
-                const connectionCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-                
-                // Save user data to Firestore
-                const { doc, setDoc } = window.firebaseModules;
-                const userData = {
-                    name: name,
-                    email: email,
-                    connectionCode: connectionCode,
-                    partnerId: null,
-                    profilePic: profilePicData || null,
-                    createdAt: new Date().toISOString()
-                };
-                
-                await setDoc(doc(window.firebaseDb, 'users', userCredential.user.uid), userData);
-                
-                currentUser = { id: userCredential.user.uid, ...userData };
-                showSyncStatus('synced', 'Account created!');
-                showMessage('Account created successfully!', 'success');
-                setTimeout(() => showConnectionView(), 1000);
-            } catch (error) {
-                console.error('Signup error:', error);
-                showSyncStatus('error', 'Account creation failed');
-                showMessage('Error creating account: ' + error.message, 'error');
+            
+            await loadUserProfile();
+            
+            // Check if user has a couple, if not show couple code screen
+            const userData = userDoc.exists ? userDoc.data() : await (await db.collection('users').doc(currentUser.uid).get()).data();
+            if (!userData.coupleId) {
+                showCoupleCodeScreen();
+            } else {
+                currentCoupleId = userData.coupleId;
+                setupCoupleSync();
+                showMainApp();
             }
         }
 
-        async function connectWithPartner() {
-            const partnerCode = document.getElementById('partnerCode').value.toUpperCase().trim();
+        async function loadUserProfile() {
+            if (!currentUser) return;
             
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            const userData = userDoc.data();
+            
+            if (userData) {
+                document.getElementById('displayName').textContent = userData.displayName || 'User';
+                document.getElementById('displayNameInput').value = userData.displayName || '';
+                
+                if (userData.anniversary) {
+                    document.getElementById('anniversaryInput').value = userData.anniversary;
+                }
+                
+                const initials = (userData.displayName || 'U').charAt(0).toUpperCase();
+                document.getElementById('profileInitials').textContent = initials;
+                document.getElementById('settingsProfileInitials').textContent = initials;
+                
+                if (userData.profilePicture) {
+                    const profilePic = document.getElementById('profilePic');
+                    const settingsProfilePic = document.getElementById('settingsProfilePic');
+                    
+                    profilePic.innerHTML = `<img src="${userData.profilePicture}" alt="Profile">`;
+                    settingsProfilePic.innerHTML = `<img src="${userData.profilePicture}" alt="Profile">`;
+                }
+                
+                // Show partner connection section if not connected
+                if (!userData.coupleId && userData.coupleCode) {
+                    document.getElementById('partnerConnectionSection').style.display = 'block';
+                    document.getElementById('settingsCoupleCode').value = userData.coupleCode;
+                }
+                
+                currentCoupleId = userData.coupleId;
+                await loadCoupleData();
+                updateStats();
+            }
+        }
+
+        function copySettingsCode() {
+            const codeInput = document.getElementById('settingsCoupleCode');
+            codeInput.select();
+            document.execCommand('copy');
+            showNotification('Code copied! Share it with your partner 💕');
+        }
+
+        async function connectFromSettings() {
+            const partnerCode = document.getElementById('settingsPartnerCode').value.trim();
             if (!partnerCode) {
-                showMessage('Please enter your partner\'s code', 'error');
+                showNotification('Please enter your partner\'s code', 'error');
                 return;
             }
-
-            try {
-                showSyncStatus('syncing', 'Connecting...');
-                
-                // Find partner by connection code
-                const { collection, query, where, getDocs, doc, updateDoc } = window.firebaseModules;
-                const usersRef = collection(window.firebaseDb, 'users');
-                const q = query(usersRef, where('connectionCode', '==', partnerCode));
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    showSyncStatus('error', 'Code not found');
-                    showMessage('Connection code not found', 'error');
-                    return;
-                }
-                
-                const partnerDoc = querySnapshot.docs[0];
-                const partnerData = partnerDoc.data();
-                const partnerId = partnerDoc.id;
-                
-                // Create couple ID (smaller ID first for consistency)
-                coupleId = [currentUser.id, partnerId].sort().join('_');
-                
-                // Update both users with partner info
-                await updateDoc(doc(window.firebaseDb, 'users', currentUser.id), {
-                    partnerId: partnerId,
-                    coupleId: coupleId
-                });
-                
-                await updateDoc(doc(window.firebaseDb, 'users', partnerId), {
-                    partnerId: currentUser.id,
-                    coupleId: coupleId
-                });
-                
-                currentUser.partnerId = partnerId;
-                currentUser.coupleId = coupleId;
-                partnerUser = { id: partnerId, ...partnerData };
-                
-                showSyncStatus('synced', 'Connected!');
-                showMessage('Connected successfully!', 'success');
-                setTimeout(() => showMainApp(), 1000);
-            } catch (error) {
-                console.error('Connection error:', error);
-                showSyncStatus('error', 'Connection failed');
-                showMessage('Error connecting: ' + error.message, 'error');
+            
+            await connectWithPartner(partnerCode);
+            if (currentCoupleId) {
+                document.getElementById('partnerConnectionSection').style.display = 'none';
+                closeSettings();
             }
         }
 
-        async function saveJournalEntry() {
-            if (!coupleId) {
-                showMessage('Please connect with your partner first', 'error');
-                return;
-            }
-
-            const today = new Date().toISOString().split('T')[0];
-            const reflection = document.getElementById('currentUserReflection').value;
+        async function loadCoupleData() {
+            if (!currentCoupleId) return;
             
-            if (!reflection.trim()) {
-                showMessage('Please write a reflection first', 'error');
-                return;
-            }
-
-            try {
-                showSyncStatus('syncing', 'Saving...');
+            const coupleDoc = await db.collection('couples').doc(currentCoupleId).get();
+            if (coupleDoc.exists) {
+                const coupleData = coupleDoc.data();
                 
-                const { doc, setDoc } = window.firebaseModules;
-                const entryData = {
-                    date: today,
-                    question: currentDailyQuestion,
-                    category: currentQuestionCategory,
-                    [`${currentUser.id}_reflection`]: reflection,
-                    [`${currentUser.id}_name`]: currentUser.name,
-                    lastUpdated: new Date().toISOString(),
-                    updatedBy: currentUser.id
-                };
-                
-                await setDoc(doc(window.firebaseDb, 'journal_entries', `${coupleId}_${today}`), entryData, { merge: true });
-                
-                showSyncStatus('synced', 'Saved!');
-                showMessage('Journal entry saved and synced!', 'success');
-            } catch (error) {
-                console.error('Save error:', error);
-                showSyncStatus('error', 'Save failed');
-                showMessage('Error saving entry: ' + error.message, 'error');
-            }
-        }
-
-        function setupJournalListener() {
-            if (!coupleId || journalListener) return;
-            
-            const today = new Date().toISOString().split('T')[0];
-            const { doc, onSnapshot } = window.firebaseModules;
-            
-            journalListener = onSnapshot(
-                doc(window.firebaseDb, 'journal_entries', `${coupleId}_${today}`),
-                (doc) => {
-                    if (doc.exists()) {
-                        const data = doc.data();
-                        
-                        // Update partner's reflection if it exists
-                        if (partnerUser && data[`${partnerUser.id}_reflection`]) {
-                            document.getElementById('partnerReflection').value = data[`${partnerUser.id}_reflection`];
-                            
-                            // Show notification if partner just updated
-                            if (data.updatedBy === partnerUser.id && data.lastUpdated) {
-                                const updateTime = new Date(data.lastUpdated);
-                                const now = new Date();
-                                if (now - updateTime < 10000) { // Within last 10 seconds
-                                    showMessage('💕 Your partner just updated their reflection!', 'success');
-                                }
-                            }
-                        }
-                        
-                        // Load current user's reflection
-                        if (data[`${currentUser.id}_reflection`]) {
-                            document.getElementById('currentUserReflection').value = data[`${currentUser.id}_reflection`];
-                        }
-                        
-                        // Load question if it exists
-                        if (data.question && data.category) {
-                            currentDailyQuestion = data.question;
-                            currentQuestionCategory = data.category;
-                            document.getElementById('dailyQuestion').textContent = currentDailyQuestion;
-                            document.getElementById('questionCategoryBadge').textContent = currentQuestionCategory;
-                        }
+                // Load partner names
+                if (coupleData.partner1Id === currentUser.uid) {
+                    document.getElementById('partnerName1').textContent = 'You';
+                    if (coupleData.partner2Name) {
+                        document.getElementById('partnerName2').textContent = coupleData.partner2Name;
                     }
-                },
-                (error) => {
-                    console.error('Journal listener error:', error);
-                    showSyncStatus('error', 'Sync error');
-                }
-            );
-        }
-
-        function handleLogin(event) {
-            event.preventDefault();
-            login();
-        }
-
-        function handleSignup(event) {
-            event.preventDefault();
-            signup();
-        }
-
-        function showLogin() {
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('signupForm').classList.add('hidden');
-        }
-
-        function showSignup() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('signupForm').classList.remove('hidden');
-        }
-
-        function showMessage(message, type = 'info') {
-            const existingMessage = document.querySelector('.message-overlay');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-
-            const messageOverlay = document.createElement('div');
-            messageOverlay.className = 'message-overlay';
-            messageOverlay.style.cssText = `
-                position: fixed; top: 20px; right: 20px; z-index: 10000;
-                background: ${type === 'error' ? '#fed7d7' : type === 'success' ? '#c6f6d5' : '#bee3f8'};
-                color: ${type === 'error' ? '#c53030' : type === 'success' ? '#2f855a' : '#2c5282'};
-                padding: 15px 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                border-left: 4px solid ${type === 'error' ? '#e53e3e' : type === 'success' ? '#38a169' : '#3182ce'};
-                max-width: 300px; animation: slideIn 0.3s ease;
-            `;
-            messageOverlay.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span>${type === 'error' ? '⚠️' : type === 'success' ? '✅' : 'ℹ️'}</span>
-                    <span>${message}</span>
-                </div>
-            `;
-
-            document.body.appendChild(messageOverlay);
-
-            setTimeout(() => {
-                if (messageOverlay.parentNode) {
-                    messageOverlay.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => messageOverlay.remove(), 300);
-                }
-            }, 4000);
-        }
-
-        async function showConnectionView() {
-            document.getElementById('loginView').classList.add('hidden');
-            document.getElementById('connectionView').classList.remove('hidden');
-            document.getElementById('userProfile').classList.remove('hidden');
-            
-            updateUserProfile();
-            
-            if (currentUser.partnerId) {
-                // Load partner data and show main app
-                try {
-                    const { doc, getDoc } = window.firebaseModules;
-                    const partnerDoc = await getDoc(doc(window.firebaseDb, 'users', currentUser.partnerId));
-                    if (partnerDoc.exists()) {
-                        partnerUser = { id: currentUser.partnerId, ...partnerDoc.data() };
-                        coupleId = currentUser.coupleId;
-                        showMainApp();
+                } else {
+                    document.getElementById('partnerName2').textContent = 'You';
+                    if (coupleData.partner1Name) {
+                        document.getElementById('partnerName1').textContent = coupleData.partner1Name;
                     }
-                } catch (error) {
-                    console.error('Error loading partner:', error);
                 }
-            } else {
-                document.getElementById('connectionCode').textContent = currentUser.connectionCode;
-            }
-        }
-
-        function updateUserProfile() {
-            document.getElementById('userName').textContent = currentUser.name;
-            const userAvatar = document.getElementById('userAvatar');
-            
-            if (currentUser.profilePic) {
-                userAvatar.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
-            } else {
-                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
             }
         }
 
         function showMainApp() {
-            document.getElementById('connectionView').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('coupleCodeScreen').style.display = 'none';
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
             
-            // Update partner info in journal
-            if (partnerUser) {
-                document.getElementById('partnerName').textContent = `${partnerUser.name}'s Reflection`;
-                const partnerAvatar = document.getElementById('partnerAvatar');
-                if (partnerUser.profilePic) {
-                    partnerAvatar.innerHTML = `<img src="${partnerUser.profilePic}" alt="${partnerUser.name}">`;
-                } else {
-                    partnerAvatar.textContent = partnerUser.name.charAt(0).toUpperCase();
-                }
-            }
-            
-            // Update current user info in journal
-            document.getElementById('currentUserName').textContent = 'Your Reflection';
-            const currentUserAvatar = document.getElementById('currentUserAvatar');
-            if (currentUser.profilePic) {
-                currentUserAvatar.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
-            } else {
-                currentUserAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-            }
-            
-            initializeJournal();
-            setupJournalListener();
-            showJournal();
+            initializeApp();
         }
 
-        async function logout() {
+        function showAuthScreen() {
+            document.getElementById('authScreen').style.display = 'block';
+            document.getElementById('coupleCodeScreen').style.display = 'none';
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+
+        function showCoupleCodeScreen() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('coupleCodeScreen').style.display = 'block';
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'none';
+            
+            loadCoupleCode();
+        }
+
+        function generateCoupleCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        async function loadCoupleCode() {
+            if (!currentUser) return;
+            
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            const userData = userDoc.data();
+            
+            if (userData && userData.coupleCode) {
+                document.getElementById('yourCoupleCode').value = userData.coupleCode;
+            }
+        }
+
+        function copyCode() {
+            const codeInput = document.getElementById('yourCoupleCode');
+            codeInput.select();
+            document.execCommand('copy');
+            showNotification('Code copied! Share it with your partner 💕');
+        }
+
+        async function connectWithPartner(partnerCode) {
+            if (!currentUser || !partnerCode) return;
+            
             try {
-                if (journalListener) {
-                    journalListener();
-                    journalListener = null;
+                // Find partner by couple code
+                const partnerQuery = await db.collection('users')
+                    .where('coupleCode', '==', partnerCode.toUpperCase())
+                    .where('coupleId', '==', null)
+                    .limit(1)
+                    .get();
+                
+                if (partnerQuery.empty) {
+                    showNotification('Invalid code or partner already connected', 'error');
+                    return;
                 }
                 
-                const { signOut } = window.firebaseModules;
-                await signOut(window.firebaseAuth);
+                const partnerDoc = partnerQuery.docs[0];
+                const partnerId = partnerDoc.id;
+                const partnerData = partnerDoc.data();
                 
-                currentUser = null;
-                partnerUser = null;
-                coupleId = null;
+                if (partnerId === currentUser.uid) {
+                    showNotification('You cannot connect to yourself!', 'error');
+                    return;
+                }
                 
-                document.getElementById('userProfile').classList.add('hidden');
-                document.getElementById('connectionView').classList.add('hidden');
-                document.getElementById('mainApp').classList.add('hidden');
-                document.getElementById('loginView').classList.remove('hidden');
-                document.getElementById('syncIndicator').classList.add('hidden');
+                // Get current user data
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const userData = userDoc.data();
                 
-                document.getElementById('loginEmail').value = '';
-                document.getElementById('loginPassword').value = '';
-                showLogin();
+                // Create couple document
+                const coupleRef = db.collection('couples').doc();
+                currentCoupleId = coupleRef.id;
                 
-                showMessage('Logged out successfully', 'success');
-            } catch (error) {
-                console.error('Logout error:', error);
-                showMessage('Error logging out', 'error');
-            }
-        }
-
-        function initializeQuestions() {
-            allQuestions = [];
-            for (let category in categories) {
-                categories[category].forEach(question => {
-                    allQuestions.push({ category, question });
+                await coupleRef.set({
+                    partner1Id: currentUser.uid,
+                    partner1Name: userData.displayName,
+                    partner1Email: userData.email,
+                    partner1Code: userData.coupleCode,
+                    partner2Id: partnerId,
+                    partner2Name: partnerData.displayName,
+                    partner2Email: partnerData.email,
+                    partner2Code: partnerData.coupleCode,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    currentStreak: 0
                 });
+                
+                // Update both users with couple ID
+                await db.collection('users').doc(currentUser.uid).update({
+                    coupleId: currentCoupleId
+                });
+                await db.collection('users').doc(partnerId).update({
+                    coupleId: currentCoupleId
+                });
+                
+                setupCoupleSync();
+                showMainApp();
+                showNotification('Connected with your partner! 💕');
+            } catch (error) {
+                console.error('Error connecting with partner:', error);
+                showNotification('Error connecting with partner', 'error');
             }
         }
 
-        function initializeJournal() {
-            getNewDailyQuestion();
+        function skipCoupleCode() {
+            showMainApp();
+            showNotification('You can connect with your partner later in settings! 💭');
         }
 
-        function getNewDailyQuestion() {
-            if (allQuestions.length === 0) {
-                initializeQuestions();
-            }
-            
-            const randomIndex = Math.floor(Math.random() * allQuestions.length);
-            const selectedQuestion = allQuestions[randomIndex];
-            
-            currentDailyQuestion = selectedQuestion.question;
-            currentQuestionCategory = selectedQuestion.category;
-            
-            document.getElementById('dailyQuestion').textContent = currentDailyQuestion;
-            document.getElementById('questionCategoryBadge').textContent = currentQuestionCategory;
-        }
-
-        function autoSaveReflection() {
-            // Auto-save could be implemented here with debouncing
-        }
-
-        function clearJournal() {
-            document.getElementById('currentUserReflection').value = '';
-            showMessage('Journal cleared', 'info');
-        }
-
-        function showJournal() {
-            setActiveMode('journal');
-            document.getElementById('journalView').classList.remove('hidden');
-            document.getElementById('dateNightView').classList.add('hidden');
-            document.getElementById('historyView').classList.add('hidden');
-            document.getElementById('settingsView').classList.add('hidden');
-        }
-
-        function showDateNight() {
-            setActiveMode('dateNight');
-            document.getElementById('journalView').classList.add('hidden');
-            document.getElementById('dateNightView').classList.remove('hidden');
-            document.getElementById('historyView').classList.add('hidden');
-            document.getElementById('settingsView').classList.add('hidden');
-            
-            if (currentDateNightIndex === 0) {
-                displayDateNightCard();
+        async function signOut() {
+            try {
+                await auth.signOut();
+                currentUser = null;
+                currentCoupleId = null;
+                showAuthScreen();
+                closeSettings();
+            } catch (error) {
+                showNotification('Error signing out', 'error');
             }
         }
 
-        function showHistory() {
-            setActiveMode('history');
-            document.getElementById('journalView').classList.add('hidden');
-            document.getElementById('dateNightView').classList.add('hidden');
-            document.getElementById('historyView').classList.remove('hidden');
-            document.getElementById('settingsView').classList.add('hidden');
-        }
-
-        function showSettings() {
-            setActiveMode('settings');
-            document.getElementById('journalView').classList.add('hidden');
-            document.getElementById('dateNightView').classList.add('hidden');
-            document.getElementById('historyView').classList.add('hidden');
-            document.getElementById('settingsView').classList.remove('hidden');
+        // Initialize the app
+        function initializeApp() {
+            const todaysQuestion = getTodaysQuestion();
             
-            // Update settings view with current data
-            updateAllProfilePictures();
-            document.getElementById('settingsConnectionCode').textContent = currentUser.connectionCode;
-            document.getElementById('displayNameInput').value = currentUser.name;
-        }
+            // Set the same question for both partners
+            document.getElementById('category1').textContent = todaysQuestion.category;
+            document.getElementById('question1').textContent = todaysQuestion.question;
+            document.getElementById('category2').textContent = todaysQuestion.category;
+            document.getElementById('question2').textContent = todaysQuestion.question;
 
-        function setActiveMode(mode) {
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            // Load saved entries
+            loadSavedEntries();
             
-            if (mode === 'journal') {
-                document.querySelectorAll('.mode-btn')[0].classList.add('active');
-            } else if (mode === 'dateNight') {
-                document.querySelectorAll('.mode-btn')[1].classList.add('active');
-            } else if (mode === 'history') {
-                document.querySelectorAll('.mode-btn')[2].classList.add('active');
-            } else if (mode === 'settings') {
-                document.querySelectorAll('.mode-btn')[3].classList.add('active');
-            }
+            // Initialize date night cards
+            drawNewCards();
         }
 
-        function displayDateNightCard() {
-            document.getElementById('dateNightQuestion').textContent = shuffledDateNightQuestions[currentDateNightIndex];
-            document.getElementById('cardNumber').textContent = `${currentDateNightIndex + 1} / ${shuffledDateNightQuestions.length}`;
-            document.getElementById('dateNightProgress').textContent = `Card ${currentDateNightIndex + 1} of ${shuffledDateNightQuestions.length}`;
+        // Settings functions
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('show');
         }
 
-        function nextDateNightCard() {
-            currentDateNightIndex = (currentDateNightIndex + 1) % shuffledDateNightQuestions.length;
-            displayDateNightCard();
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('show');
         }
 
-        function shuffleDateNight() {
-            shuffledDateNightQuestions = [...dateNightQuestions].sort(() => Math.random() - 0.5);
-            currentDateNightIndex = 0;
-            displayDateNightCard();
-            showMessage('Cards shuffled!', 'info');
-        }
-
-        function resetDateNight() {
-            shuffledDateNightQuestions = [...dateNightQuestions];
-            currentDateNightIndex = 0;
-            displayDateNightCard();
-            showMessage('Deck reset to original order', 'info');
-        }
-
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if Firebase is available
-            if (!window.firebaseAuth) {
-                showMessage('Firebase not loaded. Please check your internet connection.', 'error');
+        async function saveSettings() {
+            if (!currentUser) return;
+            
+            const displayName = document.getElementById('displayNameInput').value.trim();
+            const anniversary = document.getElementById('anniversaryInput').value;
+            
+            if (!displayName) {
+                showNotification('Please enter a display name', 'error');
                 return;
             }
             
-            // Listen for auth state changes
-            const { onAuthStateChanged } = window.firebaseModules;
-            onAuthStateChanged(window.firebaseAuth, async (user) => {
-                if (user) {
-                    try {
-                        const { doc, getDoc } = window.firebaseModules;
-                        const userDoc = await getDoc(doc(window.firebaseDb, 'users', user.uid));
-                        if (userDoc.exists()) {
-                            currentUser = { id: user.uid, ...userDoc.data() };
-                            showConnectionView();
+            try {
+                const updateData = { displayName: displayName };
+                if (anniversary) {
+                    updateData.anniversary = anniversary;
+                }
+                
+                await db.collection('users').doc(currentUser.uid).update(updateData);
+                
+                await loadUserProfile();
+                closeSettings();
+                showNotification('Settings saved! ✨');
+            } catch (error) {
+                showNotification('Error saving settings', 'error');
+            }
+        }
+
+        async function uploadProfilePicture(file) {
+            if (!currentUser || !file) return;
+            
+            try {
+                const storageRef = storage.ref(`profile-pictures/${currentUser.uid}`);
+                const snapshot = await storageRef.put(file);
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                
+                await db.collection('users').doc(currentUser.uid).update({
+                    profilePicture: downloadURL
+                });
+                
+                await loadUserProfile();
+                showNotification('Profile picture updated! 📸');
+            } catch (error) {
+                showNotification('Error uploading picture', 'error');
+            }
+        }
+
+        // Save journal entry
+        async function saveEntry(partner) {
+            if (!currentUser) return;
+            
+            const textarea = document.getElementById(`journal${partner}`);
+            const entry = textarea.value.trim();
+            
+            if (!entry) {
+                showNotification('Please write something before saving! 💭', 'error');
+                return;
+            }
+
+            const today = new Date().toDateString();
+            const todaysQuestion = getTodaysQuestion();
+            
+            const entryData = {
+                date: today,
+                question: todaysQuestion.question,
+                category: todaysQuestion.category,
+                entry: entry,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                userId: currentUser.uid,
+                partner: partner
+            };
+
+            try {
+                const saveBtn = document.getElementById(`saveBtn${partner}`);
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+                
+                if (currentCoupleId) {
+                    await db.collection('couples').doc(currentCoupleId)
+                        .collection('entries').doc(`${today}-${currentUser.uid}-${partner}`).set(entryData);
+                } else {
+                    // Save locally if no couple yet
+                    const storageKey = `journal_partner${partner}`;
+                    let entries = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                    entries = entries.filter(e => e.date !== today);
+                    entries.push(entryData);
+                    localStorage.setItem(storageKey, JSON.stringify(entries));
+                }
+                
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Entry';
+                showNotification('Entry saved! 💕');
+                
+                // Update streak after saving
+                setTimeout(() => {
+                    calculateStreak();
+                }, 1000);
+            } catch (error) {
+                const saveBtn = document.getElementById(`saveBtn${partner}`);
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Entry';
+                showNotification('Error saving entry', 'error');
+            }
+        }
+
+        // Load saved entries for today
+        async function loadSavedEntries() {
+            if (!currentUser) return;
+            
+            const today = new Date().toDateString();
+            
+            try {
+                if (currentCoupleId) {
+                    // Load from Firebase
+                    const entriesSnapshot = await db.collection('couples').doc(currentCoupleId)
+                        .collection('entries')
+                        .where('date', '==', today)
+                        .where('userId', '==', currentUser.uid)
+                        .get();
+                    
+                    entriesSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const textarea = document.getElementById(`journal${data.partner}`);
+                        if (textarea) {
+                            textarea.value = data.entry;
                         }
-                    } catch (error) {
-                        console.error('Error loading user data:', error);
+                    });
+                } else {
+                    // Load from localStorage
+                    [1, 2].forEach(partner => {
+                        const storageKey = `journal_partner${partner}`;
+                        const entries = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                        const todayEntry = entries.find(e => e.date === today);
+                        
+                        if (todayEntry) {
+                            document.getElementById(`journal${partner}`).value = todayEntry.entry;
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading entries:', error);
+            }
+        }
+
+        // Draw new date night cards
+        function drawNewCards() {
+            const shuffled = [...dateNightQuestions].sort(() => 0.5 - Math.random());
+            const selectedQuestions = shuffled.slice(0, 3);
+            
+            selectedQuestions.forEach((question, index) => {
+                document.getElementById(`dateCard${index + 1}`).textContent = question;
+            });
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Calculate days together and streak
+        function updateStats() {
+            calculateDaysTogether();
+            calculateStreak();
+        }
+
+        async function calculateDaysTogether() {
+            if (!currentUser) return;
+            
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                const userData = userDoc.data();
+                
+                if (userData && userData.anniversary) {
+                    const anniversaryDate = new Date(userData.anniversary);
+                    const today = new Date();
+                    const timeDiff = today.getTime() - anniversaryDate.getTime();
+                    const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+                    
+                    document.getElementById('daysTogether').textContent = daysDiff > 0 ? daysDiff : 0;
+                } else {
+                    document.getElementById('daysTogether').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error calculating days together:', error);
+                document.getElementById('daysTogether').textContent = '0';
+            }
+        }
+
+        async function calculateStreak() {
+            if (!currentUser) return;
+            
+            try {
+                let streak = 0;
+                
+                if (currentCoupleId) {
+                    // Calculate from Firebase entries
+                    const entriesSnapshot = await db.collection('couples').doc(currentCoupleId)
+                        .collection('entries')
+                        .where('userId', '==', currentUser.uid)
+                        .orderBy('timestamp', 'desc')
+                        .limit(30)
+                        .get();
+                    
+                    const entries = [];
+                    entriesSnapshot.forEach(doc => {
+                        entries.push(doc.data());
+                    });
+                    
+                    // Group entries by date
+                    const entriesByDate = {};
+                    entries.forEach(entry => {
+                        if (!entriesByDate[entry.date]) {
+                            entriesByDate[entry.date] = [];
+                        }
+                        entriesByDate[entry.date].push(entry);
+                    });
+                    
+                    // Calculate streak
+                    const today = new Date();
+                    let currentDate = new Date(today);
+                    
+                    while (true) {
+                        const dateString = currentDate.toDateString();
+                        const dayEntries = entriesByDate[dateString];
+                        
+                        // Check if both partners have entries for this date
+                        if (dayEntries && dayEntries.length >= 2) {
+                            streak++;
+                            currentDate.setDate(currentDate.getDate() - 1);
+                        } else {
+                            break;
+                        }
+                    }
+                } else {
+                    // Calculate from localStorage
+                    const entries1 = JSON.parse(localStorage.getItem('journal_partner1') || '[]');
+                    const entries2 = JSON.parse(localStorage.getItem('journal_partner2') || '[]');
+                    
+                    const today = new Date();
+                    let currentDate = new Date(today);
+                    
+                    while (true) {
+                        const dateString = currentDate.toDateString();
+                        const hasEntry1 = entries1.some(e => e.date === dateString);
+                        const hasEntry2 = entries2.some(e => e.date === dateString);
+                        
+                        if (hasEntry1 && hasEntry2) {
+                            streak++;
+                            currentDate.setDate(currentDate.getDate() - 1);
+                        } else {
+                            break;
+                        }
                     }
                 }
-            });
-            
-            initializeQuestions();
-            shuffleDateNightQuestions = [...dateNightQuestions];
-            
-            const today = new Date();
-            const dateString = today.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            const todaysDateElement = document.getElementById('todaysDate');
-            if (todaysDateElement) {
-                todaysDateElement.textContent = dateString;
+                
+                document.getElementById('currentStreak').textContent = streak;
+            } catch (error) {
+                console.error('Error calculating streak:', error);
+                document.getElementById('currentStreak').textContent = '0';
             }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auth form submission
+            document.getElementById('authForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                handleAuth(email, password);
+            });
+
+            // Toggle auth mode
+            document.getElementById('toggleAuth').addEventListener('click', toggleAuthMode);
+
+            // Couple code form submission
+            document.getElementById('coupleCodeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const partnerCode = document.getElementById('partnerCode').value.trim();
+                if (partnerCode) {
+                    connectWithPartner(partnerCode);
+                }
+            });
+
+            // Profile picture upload
+            document.getElementById('profilePicInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    uploadProfilePicture(file);
+                }
+            });
+
+            // Close modal when clicking outside
+            document.getElementById('settingsModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeSettings();
+                }
+            });
+
+            // Firebase auth state listener
+            auth.onAuthStateChanged(async function(user) {
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('loadingScreen').style.display = 'block';
+                    await initializeUserData();
+                    showMainApp();
+                } else {
+                    currentUser = null;
+                    currentCoupleId = null;
+                    showAuthScreen();
+                }
+            });
+
+            // Initialize app
+            initializeApp();
         });
+
+
+
+        // Real-time sync for couple data
+        function setupCoupleSync() {
+            if (!currentCoupleId) return;
+
+            // Listen for couple updates
+            db.collection('couples').doc(currentCoupleId).onSnapshot(doc => {
+                if (doc.exists) {
+                    const coupleData = doc.data();
+                    updatePartnerInfo(coupleData);
+                }
+            });
+
+            // Listen for new entries
+            db.collection('couples').doc(currentCoupleId)
+                .collection('entries')
+                .onSnapshot(snapshot => {
+                    snapshot.docChanges().forEach(change => {
+                        if (change.type === 'added' || change.type === 'modified') {
+                            const data = change.doc.data();
+                            if (data.userId !== currentUser.uid) {
+                                // Partner's entry updated
+                                updatePartnerEntry(data);
+                            }
+                        }
+                    });
+                    // Recalculate streak when entries change
+                    setTimeout(calculateStreak, 500);
+                });
+        }
+
+        function updatePartnerInfo(coupleData) {
+            const isPartner1 = coupleData.partner1Id === currentUser.uid;
+            
+            if (isPartner1) {
+                document.getElementById('partnerName1').textContent = 'You';
+                document.getElementById('partnerName2').textContent = coupleData.partner2Name || 'Partner';
+                
+                const initials2 = (coupleData.partner2Name || 'P').charAt(0).toUpperCase();
+                document.getElementById('partnerInitials2').textContent = initials2;
+            } else {
+                document.getElementById('partnerName2').textContent = 'You';
+                document.getElementById('partnerName1').textContent = coupleData.partner1Name || 'Partner';
+                
+                const initials1 = (coupleData.partner1Name || 'P').charAt(0).toUpperCase();
+                document.getElementById('partnerInitials1').textContent = initials1;
+            }
+        }
+
+        function updatePartnerEntry(entryData) {
+            // Visual indicator that partner has written something
+            const partnerCard = entryData.partner === 1 ? 
+                document.querySelector('.card:first-child') : 
+                document.querySelector('.card:last-child');
+            
+            if (partnerCard && entryData.date === new Date().toDateString()) {
+                partnerCard.style.borderLeft = '4px solid #48bb78';
+                setTimeout(() => {
+                    partnerCard.style.borderLeft = '1px solid #f0f0f0';
+                }, 3000);
+            }
+        }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f258ad91e67adc',t:'MTc2MDU2MzA3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f2aa508063fa22',t:'MTc2MDU2NjQyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
