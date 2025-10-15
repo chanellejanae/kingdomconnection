@@ -851,7 +851,6 @@
                     </div>
                     <button class="btn" onclick="login()">Sign In</button>
                     <button class="btn btn-secondary" onclick="showSignup()">Create Account</button>
-                    <button class="btn" onclick="demoLogin()" style="background: #667eea; margin-top: 10px;">🎯 Try Demo</button>
                     <div style="text-align: center; margin-top: 15px;">
                         <button onclick="showForgotPassword()" style="background: none; border: none; color: #667eea; text-decoration: underline; cursor: pointer; font-size: 0.875rem;">Forgot Password?</button>
                     </div>
@@ -2141,11 +2140,16 @@
         }
 
         function login() {
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
             if (!email || !password) {
                 showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (!email.includes('@')) {
+                showMessage('Please enter a valid email address', 'error');
                 return;
             }
 
@@ -2156,20 +2160,38 @@
             if (user && user.password === password) {
                 currentUser = user;
                 localStorage.setItem('currentUser', JSON.stringify(user));
-                showConnectionView();
+                showMessage('Login successful!', 'success');
+                setTimeout(() => showConnectionView(), 1000);
             } else {
                 showMessage('Invalid email or password', 'error');
             }
         }
 
         function signup() {
-            const name = document.getElementById('signupName').value;
-            const email = document.getElementById('signupEmail').value;
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
             const profilePicFile = document.getElementById('profilePic').files[0];
             
             if (!name || !email || !password) {
                 showMessage('Please fill in all required fields', 'error');
+                return;
+            }
+
+            if (!email.includes('@')) {
+                showMessage('Please enter a valid email address', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            // Check if email already exists
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[email]) {
+                showMessage('An account with this email already exists', 'error');
                 return;
             }
 
@@ -2206,7 +2228,8 @@
             
             currentUser = user;
             localStorage.setItem('currentUser', JSON.stringify(user));
-            showConnectionView();
+            showMessage('Account created successfully!', 'success');
+            setTimeout(() => showConnectionView(), 1000);
         }
 
         function showConnectionView() {
@@ -2396,4 +2419,5 @@
                     dailyReflection: "I've been thinking about how grateful I am for the way we support each other's dreams. It means so much to have someone who believes in me.",
                     weeklyReflection: "This week I noticed how we've gotten better at really listening to each other during conversations. I love how we can talk about anything.",
                     monthlyReflection: "This month I want to focus on being more intentional about expressing gratitude for the little things you do every day.",
-                    question: "What's one way our relationship has drawn<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f18607f7f917f4',t:'MTc2MDU1NDQ1MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+                    question: "What's one way our relationship has drawn
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f190cf95d6fa22',t:'MTc2MDU1NDg5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
