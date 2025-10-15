@@ -331,6 +331,56 @@
             z-index: 1000;
         }
 
+        .profile-settings {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #f0f0f0;
+        }
+
+        .profile-settings h3 {
+            color: #1a1a1a;
+            margin: 0 0 20px 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .profile-pic-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .current-profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: #9ca3af;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .current-profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pic-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         .user-avatar {
             width: 36px;
             height: 36px;
@@ -788,11 +838,15 @@
                 </button>
                 <button class="mode-btn" onclick="showDateNight()">
                     💝 Date Night Cards<br>
-                    <small>200 conversation starters</small>
+                    <small>250 conversation starters</small>
                 </button>
                 <button class="mode-btn" onclick="showHistory()">
                     📚 Reflection History<br>
                     <small>View and export past entries</small>
+                </button>
+                <button class="mode-btn" onclick="showSettings()">
+                    ⚙️ Settings<br>
+                    <small>Profile picture & preferences</small>
                 </button>
             </div>
 
@@ -861,6 +915,50 @@
                     
                     <div id="historyEntries" class="history-entries">
                         <p style="text-align: center; color: #9ca3af; font-style: italic;">No journal entries yet. Start writing to see your history here!</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settingsView" class="hidden">
+                <div class="journal-container">
+                    <div class="journal-header">
+                        <h2>⚙️ Settings</h2>
+                        <p>Manage your profile and app preferences</p>
+                    </div>
+                    
+                    <div class="profile-settings">
+                        <h3>👤 Display Name</h3>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <input type="text" id="displayNameInput" placeholder="Enter your name" style="flex: 1; padding: 12px 16px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; color: #1a1a1a; transition: all 0.2s ease;">
+                            <button class="btn" onclick="updateDisplayName()">💾 Save Name</button>
+                        </div>
+                        <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">This name appears throughout the app and is visible to your partner.</p>
+                    </div>
+
+                    <div class="profile-settings">
+                        <h3>📷 Profile Picture</h3>
+                        <div class="profile-pic-section">
+                            <div class="current-profile-pic" id="currentProfilePic">👤</div>
+                            <div class="pic-controls">
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="newProfilePicInput" accept="image/*" onchange="handleNewProfilePicUpload(event)">
+                                    <label for="newProfilePicInput" class="file-input-label">📷 Change Photo</label>
+                                </div>
+                                <button class="btn btn-secondary" onclick="removeProfilePic()" id="removePhotoBtn" style="display: none;">🗑️ Remove Photo</button>
+                            </div>
+                        </div>
+                        <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">Your profile picture is visible to your partner in journal reflections and throughout the app.</p>
+                    </div>
+
+                    <div class="profile-settings">
+                        <h3>🔗 Connection Info</h3>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <p style="margin: 0 0 5px 0; color: #374151; font-weight: 500;">Your Connection Code:</p>
+                                <div class="connection-code" style="margin: 0; font-size: 1rem; padding: 12px 16px;" id="settingsConnectionCode"></div>
+                            </div>
+                        </div>
+                        <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">Share this code with your partner to connect your accounts.</p>
                     </div>
                 </div>
             </div>
@@ -1184,6 +1282,160 @@
                 preview.innerHTML = `<img src="${profilePicData}" alt="Profile Picture">`;
             };
             reader.readAsDataURL(file);
+        }
+
+        async function handleNewProfilePicUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file size (limit to 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage('Image must be smaller than 2MB', 'error');
+                return;
+            }
+            
+            try {
+                showSyncStatus('syncing', 'Updating photo...');
+                
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const newProfilePic = e.target.result;
+                    
+                    // Update in database
+                    const { doc, updateDoc } = window.firebaseModules;
+                    await updateDoc(doc(window.firebaseDb, 'users', currentUser.id), {
+                        profilePic: newProfilePic
+                    });
+                    
+                    // Update local data
+                    currentUser.profilePic = newProfilePic;
+                    
+                    // Update UI
+                    updateAllProfilePictures();
+                    
+                    showSyncStatus('synced', 'Photo updated!');
+                    showMessage('Profile picture updated successfully!', 'success');
+                };
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Error updating profile picture:', error);
+                showSyncStatus('error', 'Update failed');
+                showMessage('Error updating profile picture: ' + error.message, 'error');
+            }
+        }
+
+        async function removeProfilePic() {
+            try {
+                showSyncStatus('syncing', 'Removing photo...');
+                
+                // Update in database
+                const { doc, updateDoc } = window.firebaseModules;
+                await updateDoc(doc(window.firebaseDb, 'users', currentUser.id), {
+                    profilePic: null
+                });
+                
+                // Update local data
+                currentUser.profilePic = null;
+                
+                // Update UI
+                updateAllProfilePictures();
+                
+                showSyncStatus('synced', 'Photo removed!');
+                showMessage('Profile picture removed', 'success');
+            } catch (error) {
+                console.error('Error removing profile picture:', error);
+                showSyncStatus('error', 'Remove failed');
+                showMessage('Error removing profile picture: ' + error.message, 'error');
+            }
+        }
+
+        async function updateDisplayName() {
+            const newName = document.getElementById('displayNameInput').value.trim();
+            
+            if (!newName) {
+                showMessage('Please enter a name', 'error');
+                return;
+            }
+            
+            if (newName === currentUser.name) {
+                showMessage('Name is already up to date', 'info');
+                return;
+            }
+            
+            try {
+                showSyncStatus('syncing', 'Updating name...');
+                
+                // Update in database
+                const { doc, updateDoc } = window.firebaseModules;
+                await updateDoc(doc(window.firebaseDb, 'users', currentUser.id), {
+                    name: newName
+                });
+                
+                // Update local data
+                currentUser.name = newName;
+                
+                // Update UI everywhere
+                updateAllUserNames();
+                
+                showSyncStatus('synced', 'Name updated!');
+                showMessage('Display name updated successfully!', 'success');
+            } catch (error) {
+                console.error('Error updating display name:', error);
+                showSyncStatus('error', 'Update failed');
+                showMessage('Error updating name: ' + error.message, 'error');
+            }
+        }
+
+        function updateAllUserNames() {
+            // Update user profile in header
+            document.getElementById('userName').textContent = currentUser.name;
+            
+            // Update user avatar initials if no profile pic
+            const userAvatar = document.getElementById('userAvatar');
+            if (!currentUser.profilePic) {
+                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+            }
+            
+            // Update current user avatar in journal
+            const currentUserAvatar = document.getElementById('currentUserAvatar');
+            if (!currentUser.profilePic) {
+                currentUserAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+            }
+            
+            // Update settings view
+            const currentProfilePic = document.getElementById('currentProfilePic');
+            if (!currentUser.profilePic) {
+                currentProfilePic.textContent = currentUser.name.charAt(0).toUpperCase();
+            }
+        }
+
+        function updateAllProfilePictures() {
+            // Update user profile in header
+            const userAvatar = document.getElementById('userAvatar');
+            if (currentUser.profilePic) {
+                userAvatar.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
+            } else {
+                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+            }
+            
+            // Update current user avatar in journal
+            const currentUserAvatar = document.getElementById('currentUserAvatar');
+            if (currentUser.profilePic) {
+                currentUserAvatar.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
+            } else {
+                currentUserAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
+            }
+            
+            // Update settings view
+            const currentProfilePic = document.getElementById('currentProfilePic');
+            const removeBtn = document.getElementById('removePhotoBtn');
+            if (currentUser.profilePic) {
+                currentProfilePic.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
+                removeBtn.style.display = 'block';
+            } else {
+                currentProfilePic.textContent = currentUser.name.charAt(0).toUpperCase();
+                removeBtn.style.display = 'none';
+            }
         }
 
         // Firebase helper functions
@@ -1628,6 +1880,7 @@
             document.getElementById('journalView').classList.remove('hidden');
             document.getElementById('dateNightView').classList.add('hidden');
             document.getElementById('historyView').classList.add('hidden');
+            document.getElementById('settingsView').classList.add('hidden');
         }
 
         function showDateNight() {
@@ -1635,6 +1888,7 @@
             document.getElementById('journalView').classList.add('hidden');
             document.getElementById('dateNightView').classList.remove('hidden');
             document.getElementById('historyView').classList.add('hidden');
+            document.getElementById('settingsView').classList.add('hidden');
             
             if (currentDateNightIndex === 0) {
                 displayDateNightCard();
@@ -1646,17 +1900,33 @@
             document.getElementById('journalView').classList.add('hidden');
             document.getElementById('dateNightView').classList.add('hidden');
             document.getElementById('historyView').classList.remove('hidden');
+            document.getElementById('settingsView').classList.add('hidden');
+        }
+
+        function showSettings() {
+            setActiveMode('settings');
+            document.getElementById('journalView').classList.add('hidden');
+            document.getElementById('dateNightView').classList.add('hidden');
+            document.getElementById('historyView').classList.add('hidden');
+            document.getElementById('settingsView').classList.remove('hidden');
+            
+            // Update settings view with current data
+            updateAllProfilePictures();
+            document.getElementById('settingsConnectionCode').textContent = currentUser.connectionCode;
+            document.getElementById('displayNameInput').value = currentUser.name;
         }
 
         function setActiveMode(mode) {
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             
             if (mode === 'journal') {
-                document.querySelector('.mode-btn').classList.add('active');
+                document.querySelectorAll('.mode-btn')[0].classList.add('active');
             } else if (mode === 'dateNight') {
                 document.querySelectorAll('.mode-btn')[1].classList.add('active');
             } else if (mode === 'history') {
                 document.querySelectorAll('.mode-btn')[2].classList.add('active');
+            } else if (mode === 'settings') {
+                document.querySelectorAll('.mode-btn')[3].classList.add('active');
             }
         }
 
@@ -1726,5 +1996,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f2470f908d67bf',t:'MTc2MDU2MjM1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f258ad91e67adc',t:'MTc2MDU2MzA3OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
