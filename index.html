@@ -5,6 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kingdom Connection</title>
     
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, updateDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3jL36hYZBmQsjuI02VY8FfNRvRGuTvKk",
+            authDomain: "kingdomconnection-ac1cd.firebaseapp.com",
+            projectId: "kingdomconnection-ac1cd",
+            storageBucket: "kingdomconnection-ac1cd.firebasestorage.app",
+            messagingSenderId: ". ",
+            appId: "1:. :web:798bed278e7104fe153cae",
+            measurementId: "G-BX9X4ZXCXX"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Make Firebase available globally
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseModules = {
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut,
+            doc,
+            setDoc,
+            getDoc,
+            onSnapshot,
+            updateDoc,
+            collection,
+            query,
+            where,
+            getDocs
+        };
+    </script>
+    
     <!-- Web App Manifest -->
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIktpbmdkb20gQ29ubmVjdGlvbiIsCiAgInNob3J0X25hbWUiOiAiS2luZ2RvbSIsCiAgImRlc2NyaXB0aW9uIjogIkRlZXBlbiB5b3VyIHJlbGF0aW9uc2hpcCB0aHJvdWdoIG1lYW5pbmdmdWwgY29udmVyc2F0aW9ucyBhbmQgc2hhcmVkIGZhaXRoIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmYWZhZmEiLAogICJ0aGVtZV9jb2xvciI6ICIjNjY3ZWVhIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lnZG1sbGQwSnZlRDBpTUNBd0lERXlPQ0F4TWpnaUlIaHRiRzV6UFNKb2RIUndPaTh2ZDNkM0xuY3pMbTl5Wnk4eU1EQXdMM04yWnlJK1BHUmxabk0rUEhkcFpHVjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lnYVdROUlqQWlMejQ4TDJSbFpuTStQR2RzYVc1bFlYSkhabUZrYVdWdWRDQnBaRDBpWjNKaFpHbGxiblFpUGp4emRHOXdJRzltWm5ObGREMGlNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTTJOamRsWldFaUx6NDhjM1J2Y0NCdlptWnpaWFE5SWpFd01DVWlJSE4wYjNBdFkyOXNiM0k5SWlNM05qUmlZVElpTHo0OEwyZHNhVzVsWVhKSFptRmthV1Z1ZEQ0OGNtVmpkQ0IzYVdSMGFEMGlPREFpSUdobGFXZG9kRDBpT0RBaUlIZzlJakkwSWlCNVBTSXlOQ0lnY25nOUlqSXdJaUJtYVd4c1BTSjFjbXdvSTJkeVlXUnBaVzUwS1NJdkBqeDBaWGgwSUhnOUlqWTBJaUI1UFNJMk5DSWdabWxzYkQwaWQyaHBkR1VpSUdadmJuUXRjMmw2WlQwaU5EQnFlQ0lnWm05dWRDMTNaV2xuYUhROUlqWXdNQ0lnZEdWNGRDMWhibU5vYjNJOUltMXBaR1JzWlNJK01qVXVNVHd2ZEdWNGRENDhMM04yWno0PSIsCiAgICAgICJzaXplcyI6ICIxMjh4MTI4IiwKIAgICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9LAogICAgewogICAgICAic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU5URXlJaUJvWldsbmFIUTlJalV4TWlJZ2RtbGxkMEp2ZUQwaU1DQXdJRFV4TWlBMU1USWlJSGh0Ykc1elBTSm9kSFJ3T2k4dmQzZDNMbmN6TG05eVp5OHlNREF3TDNOMlp5SStQR1JsWm5NK1BIZHBaSFJvUFNJMU1USWlJR2hsYVdkb2REMGlOVEV5SWlCcFpEMGlNQ0lnTHo0OEwyUmxabk0rUEdkc2FXNWxZWEpIWm1Ga2FXVnVkQ0JwWkQwaVozSmhaR2xsYm5RaVBqeHpkRzl3SUc5bVpuTmxkRDBpTUNVaUlITjBiM0F0WTI5c2IzSTlJaU0yTmpkbFpXRWlMejQ4YzNSdmNDQnZabVp6WlhROUlqRXdNQ1VpSUhOMGIzQXRZMjlzYjNJOUlpTTNOalJpWVRJaUx6NDhMMmRzYVc1bFlYSkhaV0ZrYVdWdWRENDhjbVZqZENCM2FXUjBhRDBpTXpJd0lpQm9aV2xuYUhROUlqTXlNQ0lnZUQwaU9UWWlJSGs5SWprMklpQnllRDBpT0RBaUlHWnBiR3c5SW5WeWJDZ2paMkpoWkdsbGJuUXBJaTgrUEhSbGVIUWdlRDBpTWpVMklpQjVQU0l5TlRZaUlHWnBiR3c5SW5kb2FYUmxJaUJtYjI1MExYTnBlbVU5SWpFMk1IQjRJaUJtYjI1MExYZGxhV2RvZEQwaU5qQXdJaUIwWlhoMExXRnVZMmh2Y2owaWJXbGtaR3hsUGpFd01TNDJQQzkwWlhoMFBqd3ZjM1puUGc9PSIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAICAgICJ0eXBlIjogImltYWdlL3N2Zyt4bWwiCiAgICB9CiAgXQp9">
     
@@ -12,10 +54,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Kingdom Connection">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkaWVudCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2N2VlYSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzc2NGJhMiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iNDAiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+PHRleHQgeD0iOTAiIHk9IjEwNSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iODBweCIgZm9udC13ZWlnaHQ9IjYwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+💕PC90ZXh0Pjwvc3ZnPg==">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png">
     
     <!-- Standard favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdyYWRpZW50Ij48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNjY3ZWVhIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNzY0YmEyIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0idXJsKCNncmFkaWVudCkiLz48dGV4dCB4PSIxNiIgeT0iMjIiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE4cHgiIGZvbnQtd2VpZ2h0PSI2MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPjI1LjE8L3RleHQ+PC9zdmc+">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png">
     
     <!-- Android Chrome -->
     <meta name="theme-color" content="#667eea">
@@ -556,6 +598,30 @@
             font-size: 1.1em;
         }
 
+        .sync-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-indicator.syncing {
+            background: #f59e0b;
+        }
+
+        .sync-indicator.error {
+            background: #ef4444;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -610,6 +676,12 @@
 </head>
 <body>
     <div class="container">
+        <!-- Sync Indicator -->
+        <div id="syncIndicator" class="sync-indicator hidden">
+            <span id="syncIcon">🔄</span>
+            <span id="syncText">Synced</span>
+        </div>
+
         <!-- User Profile (shown when logged in) -->
         <div id="userProfile" class="user-profile hidden">
             <div class="user-avatar" id="userAvatar">👤</div>
@@ -620,7 +692,9 @@
         <!-- Login/Signup View -->
         <div id="loginView" class="login-container">
             <div class="logo-container">
-                <div class="logo" id="appLogo">💕</div>
+                <div class="logo" id="appLogo">
+                    <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='💕';">
+                </div>
             </div>
             <h2 style="color: #4a5568; margin-bottom: 30px;">Welcome to Kingdom Connection</h2>
             
@@ -636,9 +710,6 @@
                     </div>
                     <button type="submit" class="btn">Sign In</button>
                     <button type="button" class="btn btn-secondary" onclick="showSignup()">Create Account</button>
-                    <div style="text-align: center; margin-top: 15px;">
-                        <button type="button" onclick="showForgotPassword()" style="background: none; border: none; color: #667eea; text-decoration: underline; cursor: pointer; font-size: 0.875rem;">Forgot Password?</button>
-                    </div>
                 </div>
             </form>
 
@@ -656,55 +727,19 @@
                         <label for="signupPassword">Password</label>
                         <input type="password" id="signupPassword" placeholder="Create a password" required minlength="6">
                     </div>
-                    <div class="form-group">
-                        <label>Profile Picture</label>
-                        <div class="profile-pic-upload">
-                            <div class="profile-pic-preview" id="profilePreview">📷</div>
-                            <div class="file-input-wrapper">
-                                <input type="file" id="profilePic" accept="image/*" onchange="previewProfilePic(event)">
-                                <label for="profilePic" class="file-input-label">Choose Photo</label>
-                            </div>
-                        </div>
-                    </div>
                     <button type="submit" class="btn">Create Account</button>
                     <button type="button" class="btn btn-secondary" onclick="showLogin()">Back to Sign In</button>
                 </div>
             </form>
-
-            <div id="forgotPasswordForm" class="hidden">
-                <div class="login-form">
-                    <h3 style="color: #4a5568; margin-bottom: 20px; text-align: center;">Reset Password</h3>
-                    <p style="color: #718096; margin-bottom: 20px; text-align: center; font-size: 0.875rem;">Enter your email and we'll help you reset your password</p>
-                    <div class="form-group">
-                        <label for="resetEmail">Email</label>
-                        <input type="email" id="resetEmail" placeholder="Enter your email">
-                    </div>
-                    <div id="resetStep2" class="hidden">
-                        <div class="form-group">
-                            <label for="resetCode">Reset Code</label>
-                            <input type="text" id="resetCode" placeholder="Enter the code from your email">
-                            <small style="color: #718096; font-size: 0.75rem;">For demo purposes, use code: RESET123</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="newPassword">New Password</label>
-                            <input type="password" id="newPassword" placeholder="Enter new password">
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmPassword">Confirm Password</label>
-                            <input type="password" id="confirmPassword" placeholder="Confirm new password">
-                        </div>
-                    </div>
-                    <button class="btn" id="resetBtn" onclick="sendResetCode()">Send Reset Code</button>
-                    <button class="btn btn-secondary" onclick="showLogin()">Back to Sign In</button>
-                </div>
-            </div>
         </div>
 
         <!-- Connection Setup View -->
         <div id="connectionView" class="hidden">
             <div class="header">
                 <div class="logo-container">
-                    <div class="logo" id="connectionLogo">💕</div>
+                    <div class="logo" id="connectionLogo">
+                        <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='💕';">
+                    </div>
                 </div>
                 <h1>💕 Kingdom Connection</h1>
                 <p>Connect with your partner to start your journey together</p>
@@ -728,7 +763,9 @@
         <div id="mainApp" class="hidden">
             <div class="header">
                 <div class="logo-container">
-                    <div class="logo" id="mainLogo">💕</div>
+                    <div class="logo" id="mainLogo">
+                        <img src="https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png" alt="Kingdom Connection Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='💕';">
+                    </div>
                 </div>
                 <h1>💕 Kingdom Connection</h1>
                 <p>Deepen your relationship through meaningful conversations and shared faith</p>
@@ -846,11 +883,265 @@
         };
 
         const dateNightQuestions = [
+            // Faith & Spiritual Connection (50 questions)
             "If you could ask God one question about our relationship, what would it be?",
-            "What's the most romantic thing someone could do that doesn't cost any money?",
+            "What's one way you see God's hand in bringing us together?",
+            "How do you want us to pray together as a couple?",
+            "What Bible verse do you think describes our love story?",
+            "If we could serve God together anywhere in the world, where would you choose?",
+            "What's a spiritual goal you have for us this year?",
+            "How has your faith grown since we've been together?",
+            "What's your favorite way to worship God together?",
+            "If we wrote a prayer for our relationship, what would it say?",
+            "What Christian couple do you most admire and why?",
+            "How do you see us honoring God in our daily life together?",
+            "What's one way I help you grow closer to Jesus?",
+            "If we could ask a biblical couple for relationship advice, who would it be?",
+            "What does 'equally yoked' mean to you in our relationship?",
+            "How do you want us to handle disagreements in a Christ-like way?",
+            "What's your favorite thing about praying with me?",
+            "If we could lead a ministry together, what would it be?",
+            "How do you see God using our relationship to impact others?",
+            "What's a worship song that reminds you of us?",
+            "How do you want us to celebrate God's goodness together?",
+            "What's one way we can better support each other's spiritual growth?",
+            "If we could have dinner with any Christian leader, who would it be?",
+            "What does it mean to you to have a godly relationship?",
+            "How do you see us encouraging other couples in their faith?",
+            "What's your favorite Bible story about love or marriage?",
+            "How do you want us to handle stress in a way that honors God?",
+            "What's one spiritual discipline you'd like us to do together?",
+            "If we could plant a church together, what would it focus on?",
+            "How has God used you to bless my life?",
+            "What's your vision for our family's spiritual legacy?",
+            "How do you see us growing in wisdom together?",
+            "What's one way we can better love our neighbors as a couple?",
+            "If we could write a devotional together, what would the theme be?",
+            "How do you want us to handle success in a humble way?",
+            "What's your favorite thing about studying the Bible together?",
+            "How do you see God preparing us for marriage?",
+            "What's one way we can better steward the gifts God has given us?",
+            "If we could go on a mission trip together, where would we go?",
+            "How do you want us to celebrate the Sabbath as a couple?",
+            "What's your favorite way to see God's creation together?",
+            "How do you see us encouraging each other during difficult seasons?",
+            "What's one way we can better practice hospitality together?",
+            "If we could memorize a book of the Bible together, which would it be?",
+            "How do you want us to handle money in a way that honors God?",
+            "What's your favorite thing about our spiritual conversations?",
+            "How do you see us growing in patience and kindness together?",
+            "What's one way we can better serve our community as a couple?",
+            "If we could start a tradition to honor God, what would it be?",
+            "How do you want us to celebrate God's faithfulness in our relationship?",
+            "What's your vision for how we'll raise children in the faith?",
+
+            // Dreams & Future (50 questions)
             "How do you think our love story will be different in 10 years?",
+            "What's one dream you have that you've never told anyone?",
+            "If we could live anywhere in the world for a year, where would it be?",
+            "What does your ideal Sunday morning look like with me?",
+            "If money wasn't a factor, what would you want to do with your life?",
+            "What's one adventure you want us to go on together?",
+            "How do you picture our home looking in 5 years?",
+            "What's a skill you'd love for us to learn together?",
+            "If we could start a business together, what would it be?",
+            "What's your biggest hope for our relationship?",
+            "How many children do you want, and what would you name them?",
+            "What's one place you want to travel with me before we're 30?",
+            "If we could build our dream house, what would be the most important room?",
+            "What's a tradition you want to start in our family?",
+            "How do you want to celebrate our 50th wedding anniversary?",
+            "What's one way you want to make the world better together?",
+            "If we could retire anywhere, where would you choose?",
+            "What's your vision for how we'll spend our golden years?",
+            "What's one goal you have for us to accomplish this year?",
+            "If we could take a year off to pursue a passion, what would it be?",
+            "What's your dream vacation with me?",
+            "How do you want us to handle career changes and big decisions?",
+            "What's one way you want us to stay connected as we get older?",
+            "If we could learn any language together, which would it be?",
+            "What's your vision for our family's Christmas traditions?",
+            "How do you want us to celebrate each other's achievements?",
+            "What's one hobby you'd love for us to share?",
+            "If we could write a book together, what would it be about?",
+            "What's your dream for how we'll support each other's careers?",
+            "How do you picture us staying young at heart together?",
+            "What's one way you want us to invest in our community long-term?",
+            "If we could have any pet together, what would it be?",
+            "What's your vision for how we'll handle aging parents?",
+            "How do you want us to celebrate milestone birthdays?",
+            "What's one legacy you want us to leave together?",
+            "If we could take a class together, what would you choose?",
+            "What's your dream for our wedding day (or renewal of vows)?",
+            "How do you want us to handle life's unexpected challenges?",
+            "What's one way you want us to stay playful throughout our marriage?",
+            "If we could volunteer together regularly, what cause would you choose?",
+            "What's your vision for how we'll make decisions as a team?",
+            "How do you want us to celebrate our love story each year?",
+            "What's one adventure sport or activity you'd try with me?",
+            "If we could have a second home anywhere, where would it be?",
+            "What's your dream for how we'll handle disagreements?",
+            "How do you want us to surprise each other throughout our marriage?",
+            "What's one way you want us to keep learning and growing together?",
+            "If we could start a family foundation, what would it support?",
+            "What's your vision for how we'll stay best friends forever?",
+            "How do you want us to create new memories every year?",
+
+            // Deep Connection & Understanding (50 questions)
             "What's one thing about me that you hope never changes?",
-            "If we could serve God together anywhere in the world, where would you choose?"
+            "What's the most romantic thing someone could do that doesn't cost any money?",
+            "When do you feel most loved by me?",
+            "What's one way I make you feel safe and secure?",
+            "What's your favorite memory of us so far?",
+            "How do you prefer to be comforted when you're upset?",
+            "What's one thing you've learned about love from our relationship?",
+            "What makes you feel most appreciated in our relationship?",
+            "What's your favorite way for us to spend quality time together?",
+            "How do you know when I'm really listening to you?",
+            "What's one way I've helped you become a better person?",
+            "What does intimacy mean to you beyond the physical?",
+            "What's your favorite thing about how we communicate?",
+            "How do you like to be encouraged when you're facing challenges?",
+            "What's one way we bring out the best in each other?",
+            "What makes you feel most connected to me?",
+            "What's your favorite way for me to show affection?",
+            "How do you prefer to resolve conflicts with me?",
+            "What's one thing about our relationship that makes you smile?",
+            "What makes you feel most understood by me?",
+            "What's your favorite way for us to be spontaneous together?",
+            "How do you like to celebrate good news with me?",
+            "What's one way I support your dreams and goals?",
+            "What makes you feel most cherished in our relationship?",
+            "What's your favorite inside joke or memory we share?",
+            "How do you prefer to spend quiet moments together?",
+            "What's one way our relationship has surprised you?",
+            "What makes you feel most grateful for our love?",
+            "What's your favorite way for us to be silly together?",
+            "How do you like to be reassured when you're feeling insecure?",
+            "What's one thing about our chemistry that you love?",
+            "What makes you feel most proud of our relationship?",
+            "What's your favorite way for us to support each other's growth?",
+            "How do you prefer to share your feelings with me?",
+            "What's one way our love has changed you for the better?",
+            "What makes you feel most excited about our future?",
+            "What's your favorite way for us to be romantic?",
+            "How do you like to be surprised by me?",
+            "What's one thing about our partnership that you treasure?",
+            "What makes you feel most confident in our relationship?",
+            "What's your favorite way for us to laugh together?",
+            "How do you prefer to handle stress as a couple?",
+            "What's one way I make ordinary moments special?",
+            "What makes you feel most hopeful about our love?",
+            "What's your favorite way for us to be adventurous together?",
+            "How do you like to be pampered or cared for by me?",
+            "What's one thing about our love story that you'd never change?",
+            "What makes you feel most blessed to be with me?",
+            "What's your favorite way for us to create new traditions?",
+            "How do you prefer to end each day together?",
+
+            // Personal Growth & Values (50 questions)
+            "What's one fear you're working on overcoming?",
+            "What does success mean to you in life?",
+            "What's a childhood dream you still think about?",
+            "How do you want to be remembered by others?",
+            "What's one way you've grown in the past year?",
+            "What values are most important to you in a relationship?",
+            "What's something you're really proud of about yourself?",
+            "How do you handle stress, and how can I support you?",
+            "What's one habit you'd like to develop or break?",
+            "What makes you feel most confident and empowered?",
+            "What's your biggest strength, and how do you use it?",
+            "How do you prefer to recharge when you're feeling drained?",
+            "What's one lesson life has taught you that you'd share with others?",
+            "What does forgiveness mean to you?",
+            "What's something you're currently learning about yourself?",
+            "How do you define a life well-lived?",
+            "What's one way you want to challenge yourself this year?",
+            "What makes you feel most fulfilled and purposeful?",
+            "What's your approach to making difficult decisions?",
+            "How do you handle disappointment or setbacks?",
+            "What's one thing you wish more people understood about you?",
+            "What does loyalty mean to you in relationships?",
+            "What's your biggest motivation in life right now?",
+            "How do you prefer to celebrate your accomplishments?",
+            "What's one way you want to make a difference in the world?",
+            "What does authenticity mean to you?",
+            "What's something you're passionate about that others might not know?",
+            "How do you maintain hope during difficult times?",
+            "What's one piece of advice you'd give your younger self?",
+            "What makes you feel most grateful in life?",
+            "What's your approach to setting and achieving goals?",
+            "How do you define true friendship?",
+            "What's one way you've learned to love yourself better?",
+            "What does courage look like in your daily life?",
+            "What's something you're excited to learn or try?",
+            "How do you handle criticism or feedback?",
+            "What's one way you want to grow spiritually this year?",
+            "What makes you feel most at peace?",
+            "What's your philosophy on work-life balance?",
+            "How do you prefer to help others in need?",
+            "What's one thing you've learned about resilience?",
+            "What does generosity mean to you?",
+            "What's something you're working on accepting about yourself?",
+            "How do you cultivate joy in your everyday life?",
+            "What's one way you want to be a better person?",
+            "What does wisdom mean to you?",
+            "What's something you're grateful your parents taught you?",
+            "How do you handle change and uncertainty?",
+            "What's one way you want to leave the world better than you found it?",
+            "What makes you feel most alive and energized?",
+
+            // Fun & Lighthearted (50 questions)
+            "If you could have any superpower for a day, what would it be?",
+            "What's the most embarrassing thing that's ever happened to you?",
+            "If you could be famous for something, what would it be?",
+            "What's your weirdest food combination that you actually love?",
+            "If you could live in any TV show or movie, which would you choose?",
+            "What's the funniest thing that's ever happened to us?",
+            "If you could have dinner with any three people, living or dead, who would they be?",
+            "What's your most irrational fear?",
+            "If you could instantly become an expert at something, what would it be?",
+            "What's the best compliment you've ever received?",
+            "If you could time travel, would you go to the past or future?",
+            "What's your guilty pleasure that you're not actually guilty about?",
+            "If you could switch lives with anyone for a week, who would it be?",
+            "What's the most spontaneous thing you've ever done?",
+            "If you could have any animal as a pet, what would it be?",
+            "What's your favorite way to waste time?",
+            "If you could eliminate one thing from daily life, what would it be?",
+            "What's the best gift you've ever given someone?",
+            "If you could add one room to our future house, what would it be?",
+            "What's your favorite childhood game or activity?",
+            "If you could master any instrument overnight, which would you choose?",
+            "What's the most beautiful place you've ever seen?",
+            "If you could have any job for just one day, what would it be?",
+            "What's your favorite way to make someone smile?",
+            "If you could bring back any fashion trend, what would it be?",
+            "What's the best advice you've ever received?",
+            "If you could have any fictional character as a best friend, who would it be?",
+            "What's your favorite family tradition or memory?",
+            "If you could invent something to make life easier, what would it be?",
+            "What's the most adventurous thing on your bucket list?",
+            "If you could have any view from your bedroom window, what would it be?",
+            "What's your favorite way to celebrate small victories?",
+            "If you could be really good at any sport, which would you choose?",
+            "What's the kindest thing a stranger has ever done for you?",
+            "If you could have any magical ability, what would it be?",
+            "What's your favorite thing about your personality?",
+            "If you could redesign the human body, what would you change?",
+            "What's the most interesting conversation you've ever had?",
+            "If you could have any celebrity as a neighbor, who would it be?",
+            "What's your favorite way to surprise people?",
+            "If you could live in any historical time period, when would it be?",
+            "What's the most creative thing you've ever done?",
+            "If you could have any question answered, what would you ask?",
+            "What's your favorite thing about being your age right now?",
+            "If you could change one thing about how you were raised, what would it be?",
+            "What's the most meaningful gift you've ever received?",
+            "If you could have any talent that you don't currently have, what would it be?",
+            "What's your favorite way to make an ordinary day special?",
+            "If you could give everyone in the world one piece of advice, what would it be?",
+            "What's the best thing about being in love with me?"
         ];
 
         let currentView = 'login';
@@ -861,27 +1152,257 @@
         let currentQuestionCategory = '';
         let currentUser = null;
         let partnerUser = null;
+        let coupleId = null;
+        let journalListener = null;
 
-        // Initialize logo loading
-        function initializeLogo() {
-            const logoUrl = 'https://raw.githubusercontent.com/chanellejanae/kingdomconnection/main/logo.png';
+        // Firebase helper functions
+        function showSyncStatus(status, message) {
+            const indicator = document.getElementById('syncIndicator');
+            const icon = document.getElementById('syncIcon');
+            const text = document.getElementById('syncText');
             
-            const logoElements = ['appLogo', 'connectionLogo', 'mainLogo'];
+            indicator.className = 'sync-indicator';
             
-            logoElements.forEach(logoId => {
-                const logoElement = document.getElementById(logoId);
-                if (logoElement) {
-                    const img = new Image();
-                    img.onload = function() {
-                        logoElement.innerHTML = `<img src="${logoUrl}" alt="Kingdom Connection Logo">`;
-                    };
-                    img.onerror = function() {
-                        // Keep the heart emoji as fallback since Canva edit links don't work as direct images
-                        logoElement.textContent = '💕';
-                    };
-                    img.src = logoUrl;
+            switch(status) {
+                case 'syncing':
+                    indicator.classList.add('syncing');
+                    icon.textContent = '🔄';
+                    text.textContent = message || 'Syncing...';
+                    break;
+                case 'synced':
+                    icon.textContent = '✅';
+                    text.textContent = message || 'Synced';
+                    break;
+                case 'error':
+                    indicator.classList.add('error');
+                    icon.textContent = '❌';
+                    text.textContent = message || 'Sync Error';
+                    break;
+            }
+            
+            indicator.classList.remove('hidden');
+            
+            if (status === 'synced') {
+                setTimeout(() => {
+                    indicator.classList.add('hidden');
+                }, 2000);
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            try {
+                showSyncStatus('syncing', 'Signing in...');
+                const { signInWithEmailAndPassword } = window.firebaseModules;
+                const userCredential = await signInWithEmailAndPassword(window.firebaseAuth, email, password);
+                
+                // Get user data from Firestore
+                const { doc, getDoc } = window.firebaseModules;
+                const userDoc = await getDoc(doc(window.firebaseDb, 'users', userCredential.user.uid));
+                
+                if (userDoc.exists()) {
+                    currentUser = { id: userCredential.user.uid, ...userDoc.data() };
+                    showSyncStatus('synced', 'Signed in!');
+                    showMessage('Login successful!', 'success');
+                    setTimeout(() => showConnectionView(), 1000);
+                } else {
+                    showSyncStatus('error', 'Profile not found');
+                    showMessage('User profile not found', 'error');
                 }
-            });
+            } catch (error) {
+                console.error('Login error:', error);
+                showSyncStatus('error', 'Sign in failed');
+                showMessage('Invalid email or password', 'error');
+            }
+        }
+
+        async function signup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            
+            if (!name || !email || !password) {
+                showMessage('Please fill in all required fields', 'error');
+                return;
+            }
+
+            try {
+                showSyncStatus('syncing', 'Creating account...');
+                const { createUserWithEmailAndPassword } = window.firebaseModules;
+                const userCredential = await createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+                
+                // Generate connection code
+                const connectionCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                
+                // Save user data to Firestore
+                const { doc, setDoc } = window.firebaseModules;
+                const userData = {
+                    name: name,
+                    email: email,
+                    connectionCode: connectionCode,
+                    partnerId: null,
+                    createdAt: new Date().toISOString()
+                };
+                
+                await setDoc(doc(window.firebaseDb, 'users', userCredential.user.uid), userData);
+                
+                currentUser = { id: userCredential.user.uid, ...userData };
+                showSyncStatus('synced', 'Account created!');
+                showMessage('Account created successfully!', 'success');
+                setTimeout(() => showConnectionView(), 1000);
+            } catch (error) {
+                console.error('Signup error:', error);
+                showSyncStatus('error', 'Account creation failed');
+                showMessage('Error creating account: ' + error.message, 'error');
+            }
+        }
+
+        async function connectWithPartner() {
+            const partnerCode = document.getElementById('partnerCode').value.toUpperCase().trim();
+            
+            if (!partnerCode) {
+                showMessage('Please enter your partner\'s code', 'error');
+                return;
+            }
+
+            try {
+                showSyncStatus('syncing', 'Connecting...');
+                
+                // Find partner by connection code
+                const { collection, query, where, getDocs, doc, updateDoc } = window.firebaseModules;
+                const usersRef = collection(window.firebaseDb, 'users');
+                const q = query(usersRef, where('connectionCode', '==', partnerCode));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    showSyncStatus('error', 'Code not found');
+                    showMessage('Connection code not found', 'error');
+                    return;
+                }
+                
+                const partnerDoc = querySnapshot.docs[0];
+                const partnerData = partnerDoc.data();
+                const partnerId = partnerDoc.id;
+                
+                // Create couple ID (smaller ID first for consistency)
+                coupleId = [currentUser.id, partnerId].sort().join('_');
+                
+                // Update both users with partner info
+                await updateDoc(doc(window.firebaseDb, 'users', currentUser.id), {
+                    partnerId: partnerId,
+                    coupleId: coupleId
+                });
+                
+                await updateDoc(doc(window.firebaseDb, 'users', partnerId), {
+                    partnerId: currentUser.id,
+                    coupleId: coupleId
+                });
+                
+                currentUser.partnerId = partnerId;
+                currentUser.coupleId = coupleId;
+                partnerUser = { id: partnerId, ...partnerData };
+                
+                showSyncStatus('synced', 'Connected!');
+                showMessage('Connected successfully!', 'success');
+                setTimeout(() => showMainApp(), 1000);
+            } catch (error) {
+                console.error('Connection error:', error);
+                showSyncStatus('error', 'Connection failed');
+                showMessage('Error connecting: ' + error.message, 'error');
+            }
+        }
+
+        async function saveJournalEntry() {
+            if (!coupleId) {
+                showMessage('Please connect with your partner first', 'error');
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const reflection = document.getElementById('currentUserReflection').value;
+            
+            if (!reflection.trim()) {
+                showMessage('Please write a reflection first', 'error');
+                return;
+            }
+
+            try {
+                showSyncStatus('syncing', 'Saving...');
+                
+                const { doc, setDoc } = window.firebaseModules;
+                const entryData = {
+                    date: today,
+                    question: currentDailyQuestion,
+                    category: currentQuestionCategory,
+                    [`${currentUser.id}_reflection`]: reflection,
+                    [`${currentUser.id}_name`]: currentUser.name,
+                    lastUpdated: new Date().toISOString(),
+                    updatedBy: currentUser.id
+                };
+                
+                await setDoc(doc(window.firebaseDb, 'journal_entries', `${coupleId}_${today}`), entryData, { merge: true });
+                
+                showSyncStatus('synced', 'Saved!');
+                showMessage('Journal entry saved and synced!', 'success');
+            } catch (error) {
+                console.error('Save error:', error);
+                showSyncStatus('error', 'Save failed');
+                showMessage('Error saving entry: ' + error.message, 'error');
+            }
+        }
+
+        function setupJournalListener() {
+            if (!coupleId || journalListener) return;
+            
+            const today = new Date().toISOString().split('T')[0];
+            const { doc, onSnapshot } = window.firebaseModules;
+            
+            journalListener = onSnapshot(
+                doc(window.firebaseDb, 'journal_entries', `${coupleId}_${today}`),
+                (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        
+                        // Update partner's reflection if it exists
+                        if (partnerUser && data[`${partnerUser.id}_reflection`]) {
+                            document.getElementById('partnerReflection').value = data[`${partnerUser.id}_reflection`];
+                            
+                            // Show notification if partner just updated
+                            if (data.updatedBy === partnerUser.id && data.lastUpdated) {
+                                const updateTime = new Date(data.lastUpdated);
+                                const now = new Date();
+                                if (now - updateTime < 10000) { // Within last 10 seconds
+                                    showMessage('💕 Your partner just updated their reflection!', 'success');
+                                }
+                            }
+                        }
+                        
+                        // Load current user's reflection
+                        if (data[`${currentUser.id}_reflection`]) {
+                            document.getElementById('currentUserReflection').value = data[`${currentUser.id}_reflection`];
+                        }
+                        
+                        // Load question if it exists
+                        if (data.question && data.category) {
+                            currentDailyQuestion = data.question;
+                            currentQuestionCategory = data.category;
+                            document.getElementById('dailyQuestion').textContent = currentDailyQuestion;
+                            document.getElementById('questionCategoryBadge').textContent = currentQuestionCategory;
+                        }
+                    }
+                },
+                (error) => {
+                    console.error('Journal listener error:', error);
+                    showSyncStatus('error', 'Sync error');
+                }
+            );
         }
 
         function handleLogin(event) {
@@ -897,32 +1418,11 @@
         function showLogin() {
             document.getElementById('loginForm').classList.remove('hidden');
             document.getElementById('signupForm').classList.add('hidden');
-            document.getElementById('forgotPasswordForm').classList.add('hidden');
         }
 
         function showSignup() {
             document.getElementById('loginForm').classList.add('hidden');
             document.getElementById('signupForm').classList.remove('hidden');
-            document.getElementById('forgotPasswordForm').classList.add('hidden');
-        }
-
-        function showForgotPassword() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('signupForm').classList.add('hidden');
-            document.getElementById('forgotPasswordForm').classList.remove('hidden');
-        }
-
-        function previewProfilePic(event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById('profilePreview');
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Profile">`;
-                };
-                reader.readAsDataURL(file);
-            }
         }
 
         function showMessage(message, type = 'info') {
@@ -958,66 +1458,7 @@
             }, 4000);
         }
 
-        function login() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!email || !password) {
-                showMessage('Please fill in all fields', 'error');
-                return;
-            }
-
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            const user = users[email];
-            
-            if (user && user.password === password) {
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                showMessage('Login successful!', 'success');
-                setTimeout(() => showConnectionView(), 1000);
-            } else {
-                showMessage('Invalid email or password', 'error');
-            }
-        }
-
-        function signup() {
-            const name = document.getElementById('signupName').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            
-            if (!name || !email || !password) {
-                showMessage('Please fill in all required fields', 'error');
-                return;
-            }
-
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            if (users[email]) {
-                showMessage('An account with this email already exists', 'error');
-                return;
-            }
-
-            const newConnectionCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-            
-            const newUser = {
-                id: Date.now().toString(),
-                name: name,
-                email: email,
-                password: password,
-                connectionCode: newConnectionCode,
-                partnerId: null,
-                profilePic: null
-            };
-
-            users[email] = newUser;
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            currentUser = newUser;
-            localStorage.setItem('currentUser', JSON.stringify(newUser));
-            showMessage('Account created successfully!', 'success');
-            setTimeout(() => showConnectionView(), 1000);
-        }
-
-        function showConnectionView() {
+        async function showConnectionView() {
             document.getElementById('loginView').classList.add('hidden');
             document.getElementById('connectionView').classList.remove('hidden');
             document.getElementById('userProfile').classList.remove('hidden');
@@ -1025,7 +1466,18 @@
             updateUserProfile();
             
             if (currentUser.partnerId) {
-                loadPartnerAndShowApp();
+                // Load partner data and show main app
+                try {
+                    const { doc, getDoc } = window.firebaseModules;
+                    const partnerDoc = await getDoc(doc(window.firebaseDb, 'users', currentUser.partnerId));
+                    if (partnerDoc.exists()) {
+                        partnerUser = { id: currentUser.partnerId, ...partnerDoc.data() };
+                        coupleId = currentUser.coupleId;
+                        showMainApp();
+                    }
+                } catch (error) {
+                    console.error('Error loading partner:', error);
+                }
             } else {
                 document.getElementById('connectionCode').textContent = currentUser.connectionCode;
             }
@@ -1034,53 +1486,57 @@
         function updateUserProfile() {
             document.getElementById('userName').textContent = currentUser.name;
             const userAvatar = document.getElementById('userAvatar');
-            
-            if (currentUser.profilePic) {
-                userAvatar.innerHTML = `<img src="${currentUser.profilePic}" alt="${currentUser.name}">`;
-            } else {
-                userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-            }
-        }
-
-        function connectWithPartner() {
-            const partnerCode = document.getElementById('partnerCode').value.toUpperCase();
-            
-            if (!partnerCode) {
-                showMessage('Please enter your partner\'s code', 'error');
-                return;
-            }
-
-            showMessage('Connected successfully!', 'success');
-            setTimeout(() => showMainApp(), 1000);
-        }
-
-        function loadPartnerAndShowApp() {
-            showMainApp();
+            userAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
         }
 
         function showMainApp() {
             document.getElementById('connectionView').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             
+            // Update partner info in journal
+            if (partnerUser) {
+                document.getElementById('partnerName').textContent = `${partnerUser.name}'s Reflection`;
+                document.getElementById('partnerAvatar').textContent = partnerUser.name.charAt(0).toUpperCase();
+            }
+            
+            // Update current user info in journal
+            document.getElementById('currentUserName').textContent = 'Your Reflection';
+            document.getElementById('currentUserAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            
             initializeJournal();
+            setupJournalListener();
             showJournal();
         }
 
-        function logout() {
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            partnerUser = null;
-            
-            document.getElementById('userProfile').classList.add('hidden');
-            document.getElementById('connectionView').classList.add('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('loginView').classList.remove('hidden');
-            
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-            showLogin();
-            
-            showMessage('Logged out successfully', 'success');
+        async function logout() {
+            try {
+                if (journalListener) {
+                    journalListener();
+                    journalListener = null;
+                }
+                
+                const { signOut } = window.firebaseModules;
+                await signOut(window.firebaseAuth);
+                
+                currentUser = null;
+                partnerUser = null;
+                coupleId = null;
+                
+                document.getElementById('userProfile').classList.add('hidden');
+                document.getElementById('connectionView').classList.add('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+                document.getElementById('loginView').classList.remove('hidden');
+                document.getElementById('syncIndicator').classList.add('hidden');
+                
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                showLogin();
+                
+                showMessage('Logged out successfully', 'success');
+            } catch (error) {
+                console.error('Logout error:', error);
+                showMessage('Error logging out', 'error');
+            }
         }
 
         function initializeQuestions() {
@@ -1094,7 +1550,6 @@
 
         function initializeJournal() {
             getNewDailyQuestion();
-            loadJournalEntries();
         }
 
         function getNewDailyQuestion() {
@@ -1113,45 +1568,12 @@
         }
 
         function autoSaveReflection() {
-            // Auto-save functionality
-        }
-
-        function saveJournalEntry() {
-            const today = new Date().toISOString().split('T')[0];
-            const entry = {
-                date: today,
-                question: currentDailyQuestion,
-                category: currentQuestionCategory,
-                currentUserReflection: document.getElementById('currentUserReflection').value
-            };
-            
-            const entries = JSON.parse(localStorage.getItem('journalEntries') || '{}');
-            entries[today] = entry;
-            localStorage.setItem('journalEntries', JSON.stringify(entries));
-            
-            showMessage('Journal entry saved!', 'success');
+            // Auto-save could be implemented here with debouncing
         }
 
         function clearJournal() {
             document.getElementById('currentUserReflection').value = '';
             showMessage('Journal cleared', 'info');
-        }
-
-        function loadJournalEntries() {
-            const today = new Date().toISOString().split('T')[0];
-            const entries = JSON.parse(localStorage.getItem('journalEntries') || '{}');
-            const todayEntry = entries[today];
-            
-            if (todayEntry) {
-                document.getElementById('currentUserReflection').value = todayEntry.currentUserReflection || '';
-                
-                if (todayEntry.question) {
-                    currentDailyQuestion = todayEntry.question;
-                    currentQuestionCategory = todayEntry.category;
-                    document.getElementById('dailyQuestion').textContent = currentDailyQuestion;
-                    document.getElementById('questionCategoryBadge').textContent = currentQuestionCategory;
-                }
-            }
         }
 
         function showJournal() {
@@ -1216,19 +1638,30 @@
             showMessage('Deck reset to original order', 'info');
         }
 
-        function sendResetCode() {
-            showMessage('Reset feature coming soon!', 'info');
-        }
-
         // Initialize app when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            initializeLogo();
-            
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showConnectionView();
+            // Check if Firebase is available
+            if (!window.firebaseAuth) {
+                showMessage('Firebase not loaded. Please check your internet connection.', 'error');
+                return;
             }
+            
+            // Listen for auth state changes
+            const { onAuthStateChanged } = window.firebaseModules;
+            onAuthStateChanged(window.firebaseAuth, async (user) => {
+                if (user) {
+                    try {
+                        const { doc, getDoc } = window.firebaseModules;
+                        const userDoc = await getDoc(doc(window.firebaseDb, 'users', user.uid));
+                        if (userDoc.exists()) {
+                            currentUser = { id: user.uid, ...userDoc.data() };
+                            showConnectionView();
+                        }
+                    } catch (error) {
+                        console.error('Error loading user data:', error);
+                    }
+                }
+            });
             
             initializeQuestions();
             shuffleDateNightQuestions = [...dateNightQuestions];
@@ -1246,5 +1679,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f1f11884147adc',t:'MTc2MDU1ODgzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f23e6977157adc',t:'MTc2MDU2MjAwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
