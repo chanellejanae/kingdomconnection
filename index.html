@@ -141,14 +141,29 @@
         .days-counter-card {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            padding: 0.75rem 1.5rem;
+            padding: 1rem 1.5rem;
             border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 500;
             text-align: center;
             margin-bottom: 1.5rem;
-            display: inline-block;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .counter-number {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .counter-label {
+            font-size: 0.85rem;
+            font-weight: 400;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .main-content {
@@ -511,12 +526,18 @@
             .counters-grid {
                 grid-template-columns: 1fr 1fr 1fr !important;
                 gap: 0.5rem !important;
-                font-size: 0.8rem !important;
             }
             
             .counters-grid .days-counter-card {
-                padding: 0.5rem 0.75rem !important;
-                font-size: 0.8rem !important;
+                padding: 0.75rem 0.5rem !important;
+            }
+            
+            .counters-grid .counter-number {
+                font-size: 1.5rem !important;
+            }
+            
+            .counters-grid .counter-label {
+                font-size: 0.7rem !important;
             }
             
             .mobile-nav {
@@ -604,6 +625,11 @@
                     <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password">
                 </div>
                 
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <input type="checkbox" id="rememberMe" style="margin: 0;">
+                    <label for="rememberMe" style="margin: 0; font-size: 0.9rem; color: #4a5568;">Remember me</label>
+                </div>
+                
                 <button class="btn btn-primary" onclick="signInUser()" style="width: 100%; margin-bottom: 1rem;">Sign In</button>
                 
                 <div style="text-align: center; margin-bottom: 1rem;">
@@ -685,9 +711,18 @@
             <!-- Daily Reflection Tab -->
             <div id="daily" class="tab-content active">
                 <div class="counters-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
-                    <div class="days-counter-card" id="daysCounterCard">0 Days Together</div>
-                    <div class="days-counter-card" id="questionsCounterCard">0 Questions Answered</div>
-                    <div class="days-counter-card" id="streakCounterCard">0 Day Streak</div>
+                    <div class="days-counter-card" id="daysCounterCard">
+                        <div class="counter-number" id="daysNumber">0</div>
+                        <div class="counter-label">Days Together</div>
+                    </div>
+                    <div class="days-counter-card" id="questionsCounterCard">
+                        <div class="counter-number" id="questionsNumber">0</div>
+                        <div class="counter-label">Questions Answered</div>
+                    </div>
+                    <div class="days-counter-card" id="streakCounterCard">
+                        <div class="counter-number" id="streakNumber">0</div>
+                        <div class="counter-label">Day Streak</div>
+                    </div>
                 </div>
                 <div class="question-card">
                     <div class="date-header" id="dateHeader"></div>
@@ -1619,6 +1654,9 @@
 
         // Initialize App
         function initializeApp() {
+            // Load saved login credentials if remember me was checked
+            loadSavedCredentials();
+            
             // Check authentication state
             auth.onAuthStateChanged(user => {
                 if (user) {
@@ -1642,6 +1680,33 @@
                     showLoginScreen();
                 }
             });
+        }
+
+        // Remember Me Functionality
+        function loadSavedCredentials() {
+            const savedEmail = localStorage.getItem('rememberedEmail');
+            const savedPassword = localStorage.getItem('rememberedPassword');
+            const rememberMe = localStorage.getItem('rememberMe') === 'true';
+            
+            if (rememberMe && savedEmail && savedPassword) {
+                document.getElementById('loginEmail').value = savedEmail;
+                document.getElementById('loginPassword').value = savedPassword;
+                document.getElementById('rememberMe').checked = true;
+            }
+        }
+
+        function saveCredentials(email, password) {
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            if (rememberMe) {
+                localStorage.setItem('rememberedEmail', email);
+                localStorage.setItem('rememberedPassword', password);
+                localStorage.setItem('rememberMe', 'true');
+            } else {
+                localStorage.removeItem('rememberedEmail');
+                localStorage.removeItem('rememberedPassword');
+                localStorage.removeItem('rememberMe');
+            }
         }
 
         // Authentication Management
@@ -1698,6 +1763,8 @@
 
             auth.signInWithEmailAndPassword(email, password)
                 .then(userCredential => {
+                    // Save credentials if remember me is checked
+                    saveCredentials(email, password);
                     showAuthMessage('Successfully signed in! Loading your data...');
                 })
                 .catch(error => {
@@ -2341,10 +2408,10 @@
         function updateDaysCounter() {
             let anniversaryDate = localStorage.getItem('anniversaryDate');
             
-            const counterElement = document.getElementById('daysCounterCard');
+            const numberElement = document.getElementById('daysNumber');
             
             if (!anniversaryDate) {
-                counterElement.textContent = '0 Days Together';
+                numberElement.textContent = '0';
                 return;
             }
             
@@ -2361,41 +2428,27 @@
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
             
             if (diffDays < 0) {
-                counterElement.textContent = '0 Days Together';
+                numberElement.textContent = '0';
             } else if (diffDays === 0) {
-                counterElement.textContent = 'Anniversary Day! 💕';
-            } else if (diffDays === 1) {
-                counterElement.textContent = '1 Day Together';
+                numberElement.textContent = '💕';
             } else {
-                counterElement.textContent = `${diffDays} Days Together`;
+                numberElement.textContent = diffDays.toString();
             }
         }
 
         function updateQuestionsCounter() {
             const answeredQuestions = JSON.parse(localStorage.getItem('answeredQuestions') || '[]');
             const count = answeredQuestions.length;
-            const counterElement = document.getElementById('questionsCounterCard');
+            const numberElement = document.getElementById('questionsNumber');
             
-            if (count === 0) {
-                counterElement.textContent = '0 Questions Answered';
-            } else if (count === 1) {
-                counterElement.textContent = '1 Question Answered';
-            } else {
-                counterElement.textContent = `${count} Questions Answered`;
-            }
+            numberElement.textContent = count.toString();
         }
 
         function updateStreakCounter() {
             const streak = calculateCurrentStreak();
-            const counterElement = document.getElementById('streakCounterCard');
+            const numberElement = document.getElementById('streakNumber');
             
-            if (streak === 0) {
-                counterElement.textContent = '0 Day Streak';
-            } else if (streak === 1) {
-                counterElement.textContent = '1 Day Streak';
-            } else {
-                counterElement.textContent = `${streak} Day Streak`;
-            }
+            numberElement.textContent = streak.toString();
         }
 
         function calculateCurrentStreak() {
@@ -2821,5 +2874,5 @@
         window.addEventListener('load', initializeApp);
         window.addEventListener('resize', checkMobileView);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f38445a0fcd883',t:'MTc2MDU3NTM1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f39a7c622cd883',t:'MTc2MDU3NjI2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
