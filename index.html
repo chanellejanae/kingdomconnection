@@ -1995,24 +1995,32 @@
         }
 
         function generateDailyQuestion() {
-            const categories = Object.keys(dailyQuestions);
-            const today = new Date();
-            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-            
-            // Use couple ID and date to ensure both partners get the same question
-            const seed = coupleId ? hashString(coupleId + dayOfYear) : dayOfYear;
-            const categoryIndex = seed % categories.length;
-            const category = categories[categoryIndex];
-            
-            const questions = dailyQuestions[category];
-            const questionIndex = Math.floor(seed / categories.length) % questions.length;
-            
-            return {
-                category: category,
-                question: questions[questionIndex],
-                date: today.toDateString()
-            };
-        }
+    const categories = Object.keys(dailyQuestions);
+    const today = new Date();
+    
+    // Create a consistent seed based on the date string (YYYY-MM-DD format)
+    const dateString = today.getFullYear() + '-' + 
+                     String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                     String(today.getDate()).padStart(2, '0');
+    
+    // Use a fixed seed based on date to ensure same question for all users on same day
+    // This creates a deterministic random number based on the date
+    const dateNumber = parseInt(dateString.replace(/-/g, ''));
+    const seed = dateNumber % 999999; // Use modulo to keep number manageable
+    
+    // Create pseudo-random selection using the date seed
+    const categoryIndex = seed % categories.length;
+    const category = categories[categoryIndex];
+    
+    const questions = dailyQuestions[category];
+    const questionIndex = Math.floor(seed / categories.length) % questions.length;
+    
+    return {
+        category: category,
+        question: questions[questionIndex],
+        date: today.toDateString()
+    };
+}
 
         function displayQuestion(questionObj) {
             document.getElementById('categoryBadge').textContent = questionObj.category;
