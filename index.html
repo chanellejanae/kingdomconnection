@@ -1761,30 +1761,20 @@
                 return;
             }
 
-            showAuthMessage('Signing in...');
-
             auth.signInWithEmailAndPassword(email, password)
                 .then(userCredential => {
                     // Save credentials if remember me is checked
                     saveCredentials(email, password);
                     showAuthMessage('Successfully signed in! Loading your data...');
-                    
-                    // Force hide login screen after successful login
-                    setTimeout(() => {
-                        hideLoginScreen();
-                    }, 1000);
                 })
                 .catch(error => {
-                    console.error('Login error:', error);
                     let errorMessage = 'Sign in failed. Please try again.';
                     if (error.code === 'auth/user-not-found') {
                         errorMessage = 'No account found with this email.';
-                    } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                    } else if (error.code === 'auth/wrong-password') {
                         errorMessage = 'Incorrect password.';
                     } else if (error.code === 'auth/invalid-email') {
                         errorMessage = 'Invalid email address.';
-                    } else if (error.code === 'auth/too-many-requests') {
-                        errorMessage = 'Too many failed attempts. Please try again later.';
                     }
                     showAuthMessage(errorMessage, true);
                 });
@@ -1990,17 +1980,14 @@
 
         // Daily Question Management
         function loadTodaysQuestion() {
-            const today = new Date();
-            const dateString = today.getFullYear() + '-' + 
-                             String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                             String(today.getDate()).padStart(2, '0');
-            const savedQuestion = localStorage.getItem(`question_${dateString}`);
+            const today = new Date().toDateString();
+            const savedQuestion = localStorage.getItem(`question_${today}`);
             
             if (savedQuestion) {
                 todaysQuestion = JSON.parse(savedQuestion);
             } else {
                 todaysQuestion = generateDailyQuestion();
-                localStorage.setItem(`question_${dateString}`, JSON.stringify(todaysQuestion));
+                localStorage.setItem(`question_${today}`, JSON.stringify(todaysQuestion));
             }
             
             displayQuestion(todaysQuestion);
@@ -2010,23 +1997,10 @@
         function generateDailyQuestion() {
             const categories = Object.keys(dailyQuestions);
             const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
             
-            // Create a consistent seed based on the date string (YYYY-MM-DD format)
-            const dateString = today.getFullYear() + '-' + 
-                             String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                             String(today.getDate()).padStart(2, '0');
-            
-            // Simple hash function to convert date string to number
-            let hash = 0;
-            for (let i = 0; i < dateString.length; i++) {
-                const char = dateString.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32-bit integer
-            }
-            
-            // Use absolute value to ensure positive number
-            const seed = Math.abs(hash);
-            
+            // Use couple ID and date to ensure both partners get the same question
+            const seed = coupleId ? hashString(coupleId + dayOfYear) : dayOfYear;
             const categoryIndex = seed % categories.length;
             const category = categories[categoryIndex];
             
@@ -2036,7 +2010,7 @@
             return {
                 category: category,
                 question: questions[questionIndex],
-                date: dateString // Use consistent date format instead of toDateString()
+                date: today.toDateString()
             };
         }
 
@@ -2542,6 +2516,160 @@
             document.getElementById('dateHeader').textContent = today.toLocaleDateString('en-US', options);
         }
 
+        // Settings Management
+        function loadUserData() {
+            if (!currentUser) return;
+            
+            // Load user data from Firestore
+            db.collection('users').doc(currentUser.uid).get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        
+                        // Update display name
+                        if (userData.displayName) {
+                            document.getElementById('displayName').value = userData.displayName;
+                        }
+                        
+                        // Update anniversary date
+                        if (userData.anniversaryDate) {
+                            document.getElementById('anniversaryDate').value = userData.anniversaryDate;
+                            localStorage.setItem('anniversaryDate', userData.anniversaryDate);
+                        }
+                        
+                        // Update partner connection
+                        if (userData.partnerCode) {
+                            document.getElementById('partnerCode').value = userData.partnerCode;
+                            partnerConnected = true;
+                        }
+                        
+                        // Update couple ID
+                        if (userData.coupleId) {
+                            coupleId = userData.coupleId;
+                            document.getElementById('coupleIdDisplay').textContent = coupleId;
+                        }
+                        
+                        updateProfileDisplays();
+                        updateSyncStatus();
+                    } else {
+                        // Create user document if it doesn't exist
+                        createUserDocument();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading user data:', error);
+                });
+        }
+
+        function createUserDocument() {
+            if (!currentUser) return;
+            
+            const userData = {
+                displayName: currentUser.displayName || currentUser.email,
+                email: currentUser.email,
+                coupleId: coupleId,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            db.collection('users').doc(currentUser.uid).set(userData)
+                .then(() => {
+                    document.getElementById('displayName').value = userData.displayName;
+                    updateProfileDisplays();
+                })
+                .catch(error => {
+                    console.error('Error creating user document:', error);
+                });
+        }
+
+        // Settings Management Functions
+        function saveProfileSettings() {
+            if (!currentUser) {
+                showAuthMessage('Please sign in to save settings.', true);
+                return;
+            }
+            
+            const newName = document.getElementById('displayName').value.trim();
+            const anniversaryDate = document.getElementById('anniversaryDate').value;
+            
+            if (!newName) {
+                showAuthMessage('Please enter your name.', true);
+                return;
+            }
+            
+            // Update Firebase Auth profile
+            currentUser.updateProfile({
+                displayName: newName
+            }).then(() => {
+                // Update Firestore document
+                const updateData = {
+                    displayName: newName
+                };
+                
+                if (anniversaryDate) {
+                    updateData.anniversaryDate = anniversaryDate;
+                    localStorage.setItem('anniversaryDate', anniversaryDate);
+                }
+                
+                return db.collection('users').doc(currentUser.uid).update(updateData);
+            }).then(() => {
+                updateProfileDisplays();
+                updateAllCounters();
+                showAuthMessage('Settings saved successfully! 💕');
+            }).catch(error => {
+                console.error('Error saving settings:', error);
+                showAuthMessage('Failed to save settings. Please try again.', true);
+            });
+        }
+
+        // Event Listeners
+        document.getElementById('displayName').addEventListener('change', function() {
+            // Remove auto-save, now handled by Save Changes button
+        });
+
+        document.getElementById('anniversaryDate').addEventListener('change', function() {
+            // Remove auto-save, now handled by Save Changes button
+        });
+
+        // Utility Functions
+        function hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash);
+        }
+
+        function exportData() {
+            const data = {
+                reflections: reflections,
+                settings: {
+                    displayName: localStorage.getItem('displayName'),
+                    anniversaryDate: localStorage.getItem('anniversaryDate'),
+                    coupleId: coupleId
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kingdom-connection-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function checkMobileView() {
+            const mobileNav = document.getElementById('mobileNav');
+            if (window.innerWidth <= 768) {
+                mobileNav.classList.remove('hidden');
+            } else {
+                mobileNav.classList.add('hidden');
+            }
+        }
+
+        // Weekly Reflection Management
         function updateWeeklyHeader() {
             const today = new Date();
             const startOfWeek = new Date(today);
@@ -2549,12 +2677,6 @@
             
             const options = { month: 'long', day: 'numeric', year: 'numeric' };
             document.getElementById('weeklyDateHeader').textContent = `Week of ${startOfWeek.toLocaleDateString('en-US', options)}`;
-        }
-
-        function updateMonthlyHeader() {
-            const today = new Date();
-            const options = { month: 'long', year: 'numeric' };
-            document.getElementById('monthlyDateHeader').textContent = `Month of ${today.toLocaleDateString('en-US', options)}`;
         }
 
         function saveWeeklyReflection() {
@@ -2570,10 +2692,14 @@
                 return;
             }
             
-            const weekKey = getWeekKey();
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            const weekKey = startOfWeek.toDateString();
+            
             const reflection = {
                 id: Date.now(),
-                week: weekKey,
+                weekOf: weekKey,
                 reflection: reflectionText,
                 userId: currentUser.uid,
                 userEmail: currentUser.email,
@@ -2583,9 +2709,75 @@
             };
             
             // Save to Firebase
-            db.collection('weeklyReflections').add(reflection);
+            db.collection('weeklyReflections').add(reflection)
+                .then(() => {
+                    showAuthMessage('Weekly reflection saved successfully! 💕');
+                })
+                .catch(error => {
+                    console.error('Error saving weekly reflection:', error);
+                    showAuthMessage('Failed to save reflection. Please try again.', true);
+                });
+        }
+
+        function loadWeeklyReflections() {
+            if (!coupleId || !currentUser) return;
             
-            showAuthMessage('Weekly reflection saved successfully! 💕');
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            const weekKey = startOfWeek.toDateString();
+            let hasShownWeeklyNotification = localStorage.getItem(`weeklyNotification_${weekKey}`) === 'true';
+            
+            db.collection('weeklyReflections')
+                .where('coupleId', '==', coupleId)
+                .where('weekOf', '==', weekKey)
+                .onSnapshot(snapshot => {
+                    let partnerReflection = null;
+                    let yourReflection = null;
+                    
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.userId === currentUser.uid) {
+                            yourReflection = data.reflection;
+                        } else {
+                            partnerReflection = data;
+                        }
+                    });
+                    
+                    // Update displays
+                    if (yourReflection) {
+                        document.getElementById('yourWeeklyReflection').value = yourReflection;
+                    }
+                    
+                    if (partnerReflection) {
+                        document.getElementById('partnerWeeklyReflectionDisplay').innerHTML = partnerReflection.reflection;
+                        document.getElementById('partnerWeeklyReflectionDisplay').style.fontStyle = 'normal';
+                        document.getElementById('partnerWeeklyReflectionDisplay').style.color = '#4a5568';
+                        document.getElementById('partnerStatusWeekly').className = 'online-indicator';
+                        document.getElementById('partnerNameWeekly').textContent = partnerReflection.userName;
+                        document.getElementById('partnerInitialWeekly').textContent = partnerReflection.userName.charAt(0).toUpperCase();
+                        
+                        // Show notification for weekly reflection
+                        if (!hasShownWeeklyNotification) {
+                            showNotification('📅 Weekly Reflection Complete!', `${partnerReflection.userName} has shared their weekly reflection with you.`);
+                            localStorage.setItem(`weeklyNotification_${weekKey}`, 'true');
+                            hasShownWeeklyNotification = true;
+                        }
+                    } else {
+                        document.getElementById('partnerWeeklyReflectionDisplay').innerHTML = 'Waiting for your partner\'s weekly reflection...';
+                        document.getElementById('partnerWeeklyReflectionDisplay').style.fontStyle = 'italic';
+                        document.getElementById('partnerWeeklyReflectionDisplay').style.color = '#718096';
+                        document.getElementById('partnerStatusWeekly').className = 'offline-indicator';
+                        document.getElementById('partnerInitialWeekly').textContent = '👤';
+                    }
+                });
+        }
+
+        // Monthly Goals Management
+        function updateMonthlyHeader() {
+            const today = new Date();
+            const options = { month: 'long', year: 'numeric' };
+            document.getElementById('monthlyDateHeader').textContent = `Month of ${today.toLocaleDateString('en-US', options)}`;
         }
 
         function saveMonthlyGoal() {
@@ -2601,10 +2793,12 @@
                 return;
             }
             
-            const monthKey = getMonthKey();
+            const today = new Date();
+            const monthKey = `${today.getFullYear()}-${today.getMonth()}`;
+            
             const goal = {
                 id: Date.now(),
-                month: monthKey,
+                monthOf: monthKey,
                 goal: goalText,
                 userId: currentUser.uid,
                 userEmail: currentUser.email,
@@ -2614,70 +2808,31 @@
             };
             
             // Save to Firebase
-            db.collection('monthlyGoals').add(goal);
-            
-            showAuthMessage('Monthly goal saved successfully! 💕');
-        }
-
-        function getWeekKey() {
-            const today = new Date();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-            return startOfWeek.toDateString();
-        }
-
-        function getMonthKey() {
-            const today = new Date();
-            return `${today.getFullYear()}-${today.getMonth()}`;
-        }
-
-        function loadWeeklyReflections() {
-            if (!coupleId || !currentUser) return;
-            
-            const weekKey = getWeekKey();
-            db.collection('weeklyReflections')
-                .where('coupleId', '==', coupleId)
-                .where('week', '==', weekKey)
-                .get()
-                .then(querySnapshot => {
-                    let partnerReflection = null;
-                    let yourReflection = null;
-                    
-                    querySnapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.userId === currentUser.uid) {
-                            yourReflection = data.reflection;
-                        } else {
-                            partnerReflection = data;
-                        }
-                    });
-                    
-                    if (yourReflection) {
-                        document.getElementById('yourWeeklyReflection').value = yourReflection;
-                    }
-                    
-                    if (partnerReflection) {
-                        document.getElementById('partnerWeeklyReflectionDisplay').innerHTML = partnerReflection.reflection;
-                        document.getElementById('partnerWeeklyReflectionDisplay').style.fontStyle = 'normal';
-                        document.getElementById('partnerWeeklyReflectionDisplay').style.color = '#4a5568';
-                        document.getElementById('partnerStatusWeekly').className = 'online-indicator';
-                    }
+            db.collection('monthlyGoals').add(goal)
+                .then(() => {
+                    showAuthMessage('Monthly goal saved successfully! 🎯');
+                })
+                .catch(error => {
+                    console.error('Error saving monthly goal:', error);
+                    showAuthMessage('Failed to save goal. Please try again.', true);
                 });
         }
 
         function loadMonthlyGoals() {
             if (!coupleId || !currentUser) return;
             
-            const monthKey = getMonthKey();
+            const today = new Date();
+            const monthKey = `${today.getFullYear()}-${today.getMonth()}`;
+            let hasShownMonthlyNotification = localStorage.getItem(`monthlyNotification_${monthKey}`) === 'true';
+            
             db.collection('monthlyGoals')
                 .where('coupleId', '==', coupleId)
-                .where('month', '==', monthKey)
-                .get()
-                .then(querySnapshot => {
+                .where('monthOf', '==', monthKey)
+                .onSnapshot(snapshot => {
                     let partnerGoal = null;
                     let yourGoal = null;
                     
-                    querySnapshot.forEach(doc => {
+                    snapshot.forEach(doc => {
                         const data = doc.data();
                         if (data.userId === currentUser.uid) {
                             yourGoal = data.goal;
@@ -2686,6 +2841,7 @@
                         }
                     });
                     
+                    // Update displays
                     if (yourGoal) {
                         document.getElementById('yourMonthlyGoal').value = yourGoal;
                     }
@@ -2695,116 +2851,28 @@
                         document.getElementById('partnerMonthlyGoalDisplay').style.fontStyle = 'normal';
                         document.getElementById('partnerMonthlyGoalDisplay').style.color = '#4a5568';
                         document.getElementById('partnerStatusMonthly').className = 'online-indicator';
+                        document.getElementById('partnerNameMonthly').textContent = partnerGoal.userName;
+                        document.getElementById('partnerInitialMonthly').textContent = partnerGoal.userName.charAt(0).toUpperCase();
+                        
+                        // Show notification for monthly goal
+                        if (!hasShownMonthlyNotification) {
+                            showNotification('🎯 Monthly Goal Set!', `${partnerGoal.userName} has shared their monthly goal with you.`);
+                            localStorage.setItem(`monthlyNotification_${monthKey}`, 'true');
+                            hasShownMonthlyNotification = true;
+                        }
+                    } else {
+                        document.getElementById('partnerMonthlyGoalDisplay').innerHTML = 'Waiting for your partner\'s monthly goal...';
+                        document.getElementById('partnerMonthlyGoalDisplay').style.fontStyle = 'italic';
+                        document.getElementById('partnerMonthlyGoalDisplay').style.color = '#718096';
+                        document.getElementById('partnerStatusMonthly').className = 'offline-indicator';
+                        document.getElementById('partnerInitialMonthly').textContent = '👤';
                     }
                 });
         }
 
-        // Settings Management
-        function loadUserData() {
-            if (!currentUser) return;
-            
-            const displayName = currentUser.displayName || currentUser.email;
-            document.getElementById('displayName').value = displayName;
-            localStorage.setItem('displayName', displayName);
-            
-            updateProfileDisplays();
-            
-            // Load anniversary date
-            const savedAnniversary = localStorage.getItem('anniversaryDate');
-            if (savedAnniversary) {
-                document.getElementById('anniversaryDate').value = savedAnniversary;
-            }
-        }
-
-        function saveProfileSettings() {
-            const displayName = document.getElementById('displayName').value.trim();
-            const anniversaryDate = document.getElementById('anniversaryDate').value;
-            
-            if (!displayName) {
-                showAuthMessage('Please enter your display name.', true);
-                return;
-            }
-            
-            // Save display name
-            localStorage.setItem('displayName', displayName);
-            
-            // Save anniversary date
-            if (anniversaryDate) {
-                localStorage.setItem('anniversaryDate', anniversaryDate);
-            }
-            
-            // Update Firebase profile
-            if (currentUser) {
-                currentUser.updateProfile({
-                    displayName: displayName
-                }).then(() => {
-                    updateProfileDisplays();
-                    updateAllCounters();
-                    showAuthMessage('Profile settings saved successfully!');
-                }).catch(error => {
-                    console.error('Error updating profile:', error);
-                    showAuthMessage('Profile updated locally. Some changes may not sync.', false);
-                });
-            } else {
-                // Show success message even without Firebase
-                updateProfileDisplays();
-                updateAllCounters();
-                showAuthMessage('Profile settings saved successfully!');
-            }
-        }
-
-        function exportData() {
-            const data = {
-                reflections: reflections,
-                answeredQuestions: JSON.parse(localStorage.getItem('answeredQuestions') || '[]'),
-                answeredDates: JSON.parse(localStorage.getItem('answeredDates') || '[]'),
-                displayName: localStorage.getItem('displayName'),
-                anniversaryDate: localStorage.getItem('anniversaryDate'),
-                coupleId: coupleId
-            };
-            
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'kingdom-connection-data.json';
-            link.click();
-            
-            URL.revokeObjectURL(url);
-            showAuthMessage('Data exported successfully!');
-        }
-
-        function checkMobileView() {
-            const mobileNav = document.getElementById('mobileNav');
-            if (window.innerWidth <= 768) {
-                mobileNav.classList.remove('hidden');
-            } else {
-                mobileNav.classList.add('hidden');
-            }
-        }
-
-        // Event Listeners
+        // Initialize app when page loads
+        window.addEventListener('load', initializeApp);
         window.addEventListener('resize', checkMobileView);
-        
-        // Handle Enter key for login
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const loginForm = document.getElementById('loginForm');
-                const signUpForm = document.getElementById('signUpForm');
-                const forgotForm = document.getElementById('forgotPasswordForm');
-                
-                if (loginForm.style.display !== 'none') {
-                    signInUser();
-                } else if (signUpForm.style.display !== 'none') {
-                    signUpUser();
-                } else if (forgotForm.style.display !== 'none') {
-                    resetPassword();
-                }
-            }
-        });
-
-        // Initialize the app when page loads
-        document.addEventListener('DOMContentLoaded', initializeApp);
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f3d9941509fab2',t:'MTc2MDU3ODg0NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f39a7c622cd883',t:'MTc2MDU3NjI2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
